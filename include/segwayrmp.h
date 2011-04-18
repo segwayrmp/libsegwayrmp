@@ -37,12 +37,19 @@
 
 #include "serial.h"
 
-class SegwayRMP() {
+namespace segwayrmp {
+
+class SegwayRMP {
 public:
     SegwayRMP();
     ~SegwayRMP();
-private:
     
+    // Getter and Setters
+    
+private:
+
 };
+
+} // Namespace segwayrmp
 
 #endif
