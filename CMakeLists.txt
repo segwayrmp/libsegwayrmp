@@ -33,7 +33,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 
 # Compile the xbow_400 Library
-add_library(segwayrmp src/segwayrmp.cpp include/segwayrmp.h)
+add_library(segwayrmp src/segwayrmp.cpp include/segwayrmp.h src/rmp_io.cpp include/rmp_io.h)
 target_link_libraries(segwayrmp ${serial_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
 
 # Compile the Test program
@@ -52,7 +52,7 @@ INSTALL(TARGETS segwayrmp
     ARCHIVE DESTINATION lib
 )
 
-INSTALL(FILES include/segwayrmp.h DESTINATION include)
+INSTALL(FILES include/segwayrmp.h include/rmp_io.h DESTINATION include)
 
 IF(NOT CMAKE_FIND_INSTALL_PATH)
     set(CMAKE_FIND_INSTALL_PATH ${CMAKE_ROOT})

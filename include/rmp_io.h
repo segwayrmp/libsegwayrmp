@@ -1,5 +1,5 @@
 /**
- * @file segwayrmp.h
+ * @file rmp_io.h
  * @author  William Woodall <wjwwood@gmail.com>
  * @version 0.1
  *
@@ -29,43 +29,81 @@
  *
  * @section DESCRIPTION
  *
- * This provides a cross platform interface for the Segway RMP's.
+ * This provides different I/O methods for communicating with the RMP.
  */
- 
-#ifndef SEGWAYRMP_H
-#define SEGWAYRMP_H
 
-#include "rmp_io.h"
+#ifndef RMP_IO_H
+#define RMP_IO_H
+
+#include <vector>
+
+#include "serial.h"
 
 namespace segwayrmp {
 
-class SegwayRMP {
+static unsigned int BUFFER_SIZE = 36;
+
+class RMPIO {
 public:
-    SegwayRMP(std::string port);
-    ~SegwayRMP();
+    // Must be implemented by child class
+    virtual void connect() = 0;
+    
+    // Must be implemented by child class
+    virtual void disconnect() = 0;
+    
+    // Must be implemented by child class
+    virtual int read(unsigned char* buffer, int size) = 0;
+    
+    // Must be implemented by child class
+    virtual int write(unsigned char* buffer, int size) = 0;
+    
+    virtual void configure(std::string port, int baudrate) = 0;
+    
+    void getPacket(unsigned char* packet);
+    
+    bool isConnected() {return this->connected;}
+    
+protected:
+    bool connected;
+    
+private:
+    void fillBuffer();
+    
+    std::vector<unsigned char> data_buffer;
+    char * current_index;
+};
+
+class SerialRMPIO : public RMPIO {
+public:
+    SerialRMPIO();
+    ~SerialRMPIO();
     
     void connect();
     
-    bool go();
+    void disconnect();
     
-    // Getter and Setters
+    int read(unsigned char* buffer, int size);
     
-private:
-    bool validatePacket(unsigned char* usb_packet);
-    unsigned char computeChecksum(unsigned char* usb_packet);
+    int write(unsigned char* buffer, int size);
+    
+    void configure(std::string port, int baudrate);
+protected:
+    bool configured;
     
     std::string port;
-    RMPIO * rmp_io;
+    int baudrate;
+    
+    serial::Serial serial_port;
 };
 
-class ConnectionFailedException : public std::exception {
+class PacketRetrievalException : public std::exception {
     const char * e_what;
 public:
-    ConnectionFailedException(const char * e_what) {this->e_what = e_what;}
+    PacketRetrievalException(const char * e_what) {this->e_what = e_what;}
     
     virtual const char* what() const throw() {
         std::stringstream ss;
-        ss << "Error connecting to SegwayRMP: " << this->e_what;
+        ss << "Error retrieving a packet from the SegwayRMP: " << this->e_what;
         return ss.str().c_str();
     }
 };
