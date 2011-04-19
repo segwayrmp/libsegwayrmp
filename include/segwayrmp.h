@@ -41,13 +41,34 @@ namespace segwayrmp {
 
 class SegwayRMP {
 public:
-    SegwayRMP();
+    SegwayRMP(std::string port);
     ~SegwayRMP();
+    
+    void connect();
+    
+    bool go();
     
     // Getter and Setters
     
 private:
+    bool validatePacket(unsigned char* usb_packet);
+    unsigned char computeChecksum(unsigned char* usb_packet);
+    
+    std::string port;
+    
+    serial::Serial serial_port;
+};
 
+class ConnectionFailedException : public std::exception {
+    const char * e_what;
+public:
+    ConnectionFailedException(const char * e_what) {this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        std::stringstream ss;
+        ss << "Error connecting to SegwayRMP: " << this->e_what;
+        return ss.str().c_str();
+    }
 };
 
 } // Namespace segwayrmp
