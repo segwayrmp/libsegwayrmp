@@ -1,12 +1,15 @@
 #include "segwayrmp.h"
 
 int main(void) {
-    segwayrmp::SegwayRMP rmp("/dev/ttyUSB0");
+    segwayrmp::SegwayRMP rmp(segwayrmp::serial);
+    rmp.configure("/dev/ttyUSB0");
     rmp.connect();
-    while(rmp.go()) {
-        continue;
+    while(true) {
+        rmp.move(0.1, 0);
+        std::cout << "here" << std::endl;
+        sleep(1);
     }
-    while(rmp.go()) {
-        continue;
-    }
+    // while(rmp.go()) {
+    //     continue;
+    // }
 }

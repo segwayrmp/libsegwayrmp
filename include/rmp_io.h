@@ -30,6 +30,9 @@
  * @section DESCRIPTION
  *
  * This provides different I/O methods for communicating with the RMP.
+ * 
+ * This library depends on a Boost based Serial library: https://github.com/wjwwood/serial
+ * and Boost: http://www.boost.org/
  */
 
 #ifndef RMP_IO_H
@@ -37,9 +40,17 @@
 
 #include <vector>
 
+#include <boost/thread.hpp>
+
 #include "serial.h"
 
 namespace segwayrmp {
+
+typedef struct {
+    unsigned short id;
+    unsigned char channel;
+    unsigned char data[8];
+} Packet;
 
 static unsigned int BUFFER_SIZE = 36;
 
@@ -59,18 +70,14 @@ public:
     
     virtual void configure(std::string port, int baudrate) = 0;
     
-    void getPacket(unsigned char* packet);
+    virtual void getPacket(Packet &packet) = 0;
+    
+    virtual void sendPacket(Packet &packet) = 0;
     
     bool isConnected() {return this->connected;}
     
 protected:
     bool connected;
-    
-private:
-    void fillBuffer();
-    
-    std::vector<unsigned char> data_buffer;
-    char * current_index;
 };
 
 class SerialRMPIO : public RMPIO {
@@ -87,19 +94,37 @@ public:
     int write(unsigned char* buffer, int size);
     
     void configure(std::string port, int baudrate);
+    
+    void getPacket(Packet &packet);
+    
+    void sendPacket(Packet &packet);
+    
 protected:
+    void fillBuffer();
+    unsigned char computeChecksum(unsigned char* usb_packet);
+    
     bool configured;
     
     std::string port;
     int baudrate;
     
     serial::Serial serial_port;
+    
+    std::vector<unsigned char> data_buffer;
 };
 
 class PacketRetrievalException : public std::exception {
+    int _error_number;
     const char * e_what;
 public:
-    PacketRetrievalException(const char * e_what) {this->e_what = e_what;}
+    PacketRetrievalException(int _error_number, const char * e_what) {
+        this->_error_number = _error_number;
+        this->e_what = e_what;
+    }
+    
+    int error_number() {
+        return this->_error_number;
+    }
     
     virtual const char* what() const throw() {
         std::stringstream ss;

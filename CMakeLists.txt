@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 2.4.6)
 
 project(segwayrmp)
 
+set(BUILD_SHARED_LIBS OFF)
+
+SET(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
+
 # set the default path for built executables to the "bin" directory
 IF(NOT EXECUTABLE_OUTPUT_PATH)
     set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
