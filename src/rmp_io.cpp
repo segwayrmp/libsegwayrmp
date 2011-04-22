@@ -148,10 +148,10 @@ void SerialRMPIO::getPacket(Packet &packet) {
 }
 
 void SerialRMPIO::sendPacket(Packet &packet) {
-    unsigned char usb_packet[18] = {0xF0, 0x55, 0x01, 0x00, 0x00, 0x00, 0x04, 0x13, 0x00, 
+    unsigned char usb_packet[18] = {0xF0, 0x55, 0x00, 0x00, 0x00, 0x00, 0x04, 0x13, 0x00, 
                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     // Set the desitnation channel, 0x01 for 0xAA and 0x02 for 0xBB
-    // usb_packet[3] = packet.channel;
+    usb_packet[2] = packet.channel;
     // Copy movement and configuration commands
     for(int i = 0; i < 8; ++i) {
         usb_packet[9+i] = packet.data[i];
@@ -160,7 +160,6 @@ void SerialRMPIO::sendPacket(Packet &packet) {
     usb_packet[17] = this->computeChecksum(usb_packet);
     // Write the data
     this->write(usb_packet, 18);
-    printHex(reinterpret_cast<char *>(usb_packet), 18);
 }
 
 void SerialRMPIO::fillBuffer() {

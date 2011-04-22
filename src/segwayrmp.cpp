@@ -2,7 +2,6 @@
 
 inline void defaultSegwayStatusCallback(segwayrmp::SegwayStatus &segway_status) {
     std::cout << segway_status.str() << std::endl << std::endl;
-    // std::cout << segway_status.controller_gain_schedule << ".";
 }
 
 inline void defaultDebugMsgCallback(const std::string &msg) {
@@ -35,9 +34,9 @@ SegwayStatus::SegwayStatus() {
     yaw_rate, servo_frames, integrated_left_wheel_position,
     integrated_right_wheel_position, integrated_forward_position,
     integrated_turn_position, left_motor_torque, right_motor_torque,
-    ui_battery_voltage, powerbase_battery_voltage = 0.0;
-    operational_mode, controller_gain_schedule, commanded_velocity,
-    commanded_yaw_rate, motor_status = 0;
+    ui_battery_voltage, powerbase_battery_voltage, commanded_velocity,
+    commanded_yaw_rate = 0.0;
+    operational_mode, controller_gain_schedule, motor_status = 0;
 }
 
 std::string SegwayStatus::str() {
@@ -95,15 +94,16 @@ void SegwayRMP::connect(OperationalMode operational_mode, ControllerGainSchedule
     // Kick off the read thread
     this->startContinuousRead();
     
-    // Set the operational mode and controller gain schedule
-    this->setOperationalMode(operational_mode);
-    this->setControllerGainSchedule(controller_gain_schedule);
     // Lock or unlock balancing depending on the mode.
     if(operational_mode == balanced) {
         this->setBalanceModeLocking(false);
     } else {
         this->setBalanceModeLocking(true);
     }
+    
+    // Set the operational mode and controller gain schedule
+    this->setOperationalMode(operational_mode);
+    this->setControllerGainSchedule(controller_gain_schedule);
     
     // Reset all the integrators
     this->resetAllIntegrators();
@@ -114,19 +114,21 @@ void SegwayRMP::move(float linear_velocity, float angular_velocity) {
     if(!this->connected)
         throw(MoveFailedException("Not Connected."));
     try {
-        short int lv = (short int)linear_velocity*3.6*147.0/1.609344;
-        short int av = (short int)angular_velocity*1024.0;
+        short int lv = (short int)(linear_velocity*MPS_TO_COUNTS);
+        short int av = (short int)(angular_velocity*1024.0);
         
         Packet packet;
         
         packet.id = 0x0413;
         
-        packet.channel = 0x01;
-        
-        packet.data[0] = (unsigned char)(lv & 0x00FF);
-        packet.data[1] = (unsigned char)(lv & 0xFF00) >> 8;
-        packet.data[2] = (unsigned char)(av & 0x00FF);
-        packet.data[3] = (unsigned char)(av & 0xFF00) >> 8;
+        packet.data[0] = (unsigned char)((lv & 0xFF00) >> 8);
+        packet.data[1] = (unsigned char)(lv & 0x00FF);
+        packet.data[2] = (unsigned char)((av & 0xFF00) >> 8);
+        packet.data[3] = (unsigned char)(av & 0x00FF);
+        packet.data[4] = 0x00;
+        packet.data[5] = 0x00;
+        packet.data[6] = 0x00;
+        packet.data[7] = 0x00;
         
         this->rmp_io->sendPacket(packet);
     } catch(std::exception &e) {
@@ -143,8 +145,10 @@ void SegwayRMP::setOperationalMode(OperationalMode operational_mode) {
         
         packet.id = 0x0413;
         
-        packet.channel = 0x01;
-        
+        packet.data[0] = 0x00;
+        packet.data[1] = 0x00;
+        packet.data[2] = 0x00;
+        packet.data[3] = 0x00;
         packet.data[4] = 0x00;
         packet.data[5] = 0x10;
         packet.data[6] = 0x00;
@@ -169,20 +173,20 @@ void SegwayRMP::setControllerGainSchedule(ControllerGainSchedule controller_gain
         
         packet.id = 0x0413;
         
-        packet.channel = 0x01;
-        
+        packet.data[0] = 0x00;
+        packet.data[1] = 0x00;
+        packet.data[2] = 0x00;
+        packet.data[3] = 0x00;
         packet.data[4] = 0x00;
-        packet.data[5] = 13;
+        packet.data[5] = 0x0D;
         packet.data[6] = 0x00;
         packet.data[7] = (unsigned char)controller_gain_schedule;
         
-        printHex(reinterpret_cast<char *>(packet.data), 8);
-        
         this->rmp_io->sendPacket(packet);
         
-        while(this->segway_status.controller_gain_schedule != controller_gain_schedule) {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(10)); // Check again in 10 ms
-        }
+        // while(this->segway_status.controller_gain_schedule != controller_gain_schedule) {
+        //     boost::this_thread::sleep(boost::posix_time::milliseconds(10)); // Check again in 10 ms
+        // }
     } catch(std::exception &e) {
         throw(ConfigurationException("Controller Gain Schedule", e.what()));
     }
@@ -197,8 +201,10 @@ void SegwayRMP::setBalanceModeLocking(bool state) {
         
         packet.id = 0x0413;
         
-        packet.channel = 0x01;
-        
+        packet.data[0] = 0x00;
+        packet.data[1] = 0x00;
+        packet.data[2] = 0x00;
+        packet.data[3] = 0x00;
         packet.data[4] = 0x00;
         packet.data[5] = 0x0F;
         packet.data[6] = 0x00;
@@ -222,8 +228,10 @@ void SegwayRMP::resetAllIntegrators() {
         
         packet.id = 0x0413;
         
-        packet.channel = 0x01;
-        
+        packet.data[0] = 0x00;
+        packet.data[1] = 0x00;
+        packet.data[2] = 0x00;
+        packet.data[3] = 0x00;
         packet.data[4] = 0x00;
         packet.data[5] = 0x32;
         packet.data[6] = 0x00;
@@ -346,8 +354,8 @@ void SegwayRMP::parsePacket(Packet &packet) {
             this->segway_status.powerbase_battery_voltage = ((((packet.data[6] & 0x0ff) << 8) | (packet.data[7] & 0x0ff)) & 0x0ffff)/4.0;
             break;
         case 0x0407:
-            this->segway_status.commanded_velocity = getShortInt(packet.data[0], packet.data[1]);
-            this->segway_status.commanded_yaw_rate = getShortInt(packet.data[0], packet.data[1]);
+            this->segway_status.commanded_velocity = (float)getShortInt(packet.data[0], packet.data[1])/MPS_TO_COUNTS;
+            this->segway_status.commanded_yaw_rate = (float)getShortInt(packet.data[0], packet.data[1])/1024.0;
             status_updated = true;
             break;
         case 0x0680:
@@ -357,8 +365,6 @@ void SegwayRMP::parsePacket(Packet &packet) {
                 this->segway_status.motor_status = 0;
             break;
         default: // Unknown/Unhandled Message
-            printf("> Unhandled Packet id: %X, Packet Channel: %X, Packet Data: ", packet.id, packet.channel);
-            printHex(reinterpret_cast<char *>(packet.data), 8);
             break;
     };
     

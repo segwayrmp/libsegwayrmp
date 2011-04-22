@@ -6,10 +6,6 @@ int main(void) {
     rmp.connect();
     while(true) {
         rmp.move(0.1, 0);
-        std::cout << "here" << std::endl;
-        sleep(1);
+        usleep(100000);
     }
-    // while(rmp.go()) {
-    //     continue;
-    // }
 }

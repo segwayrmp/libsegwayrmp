@@ -42,6 +42,19 @@
 namespace segwayrmp {
 
 /*!
+ * Converts Meters per Second to Counts to be sent to the segway.
+ * 
+ *      X meters   1 kilometer    1 mile     3600 seconds
+ * X' = -------- * ----------- * --------- * ------------
+ *       second    1000 meters   1.609 km        1 hr
+ * 
+ *           X' milesperhr    1176 counts
+ * Command = ------------- * -------------  (From the datasheet)
+ *                 1          8 milesperhr
+ */
+static double MPS_TO_COUNTS = (1.0/1000.0)*(1.0/1.609)*(3600.0/1.0)*(1176.0/8.0);
+
+/*!
  * Defines the possible modes of communication for the Segway Interface.
  */
 typedef enum {
@@ -92,8 +105,8 @@ public:
     float powerbase_battery_voltage;
     OperationalMode operational_mode;
     ControllerGainSchedule controller_gain_schedule;
-    int commanded_velocity;
-    int commanded_yaw_rate;
+    float commanded_velocity;
+    float commanded_yaw_rate;
     
     int motor_status;
     
