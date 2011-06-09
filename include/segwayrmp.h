@@ -127,7 +127,7 @@ public:
      * 
      * \param interface_type This must be can, usb, or serial. Default is usb.
      */
-    SegwayRMP(InterfaceType interface_type = usb);
+    SegwayRMP(InterfaceType interface_type = serial);
     ~SegwayRMP();
     
     /*!

@@ -299,12 +299,12 @@ void SegwayRMP::stopContinuousRead() {
     this->continuous_read_thread.join();
 }
 
-inline short int getShortInt(char byte_1, char byte_2) {
-    return (short int)(((int)byte_1<<8)|(int)byte_2);
+inline short int getShortInt(char low, char high) {
+    return (short int)(((unsigned short int)high<<8)|(unsigned short int)low);
 }
 
-inline int getInt(char byte_1, char byte_2, char byte_3, char byte_4) {
-    return (int)(((int)byte_3<<24)|((int)byte_4<<16)|((int)byte_1<<8)|(int)byte_2);
+inline int getInt(char llow, char lhigh, char hlow, char hhigh) {
+    return (int)(((int)hhigh<<24)|((int)hlow<<16)|((int)lhigh<<8)|(int)llow);
 }
 
 bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
@@ -318,15 +318,15 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
             break;
         case 0x0401:
             _segway_status.pitch      = getShortInt(packet.data[0], packet.data[1])/7.8;
-            _segway_status.pitch_rate = getShortInt(packet.data[2], packet.data[3])/7.78;
-            _segway_status.roll       = getShortInt(packet.data[4], packet.data[5])/7.78;
-            _segway_status.roll_rate  = getShortInt(packet.data[6], packet.data[7])/7.78;
+            _segway_status.pitch_rate = getShortInt(packet.data[2], packet.data[3])/7.8;
+            _segway_status.roll       = getShortInt(packet.data[4], packet.data[5])/7.8;
+            _segway_status.roll_rate  = getShortInt(packet.data[6], packet.data[7])/7.8;
             _segway_status.touched = true;
             break;
         case 0x0402:
             _segway_status.left_wheel_speed  = getShortInt(packet.data[0], packet.data[1])/332.0;
-            _segway_status.right_wheel_speed = getShortInt(packet.data[0], packet.data[1])/332.0;
-            _segway_status.yaw_rate          = getShortInt(packet.data[0], packet.data[1])/7.8;
+            _segway_status.right_wheel_speed = getShortInt(packet.data[2], packet.data[3])/332.0;
+            _segway_status.yaw_rate          = getShortInt(packet.data[4], packet.data[5])/7.8;
             _segway_status.servo_frames      = ((((packet.data[6] & 0x0ff) << 8) | (packet.data[7] & 0x0ff)) & 0x0ffff)*0.01;
             _segway_status.touched = true;
             break;
@@ -377,6 +377,9 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
 
 void SegwayRMP::parsePacket(Packet &packet) {
     bool status_updated = false;
+    
+    printf("Packet id: %X, Packet Channel: %X, Packet Data: ", packet.id, packet.channel);
+    printHex(reinterpret_cast<char *>(packet.data), 8);
     
     status_updated = this->_parsePacket(packet, this->segway_status);
     
