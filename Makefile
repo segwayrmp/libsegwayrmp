@@ -19,3 +19,7 @@ endif
 clean:
 	-cd build && make clean
 	rm -rf build bin lib
+
+.PHONY: test
+test: segwayrmp
+	-cd bin && ./segwayrmp_tests

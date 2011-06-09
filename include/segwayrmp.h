@@ -110,6 +110,8 @@ public:
     
     int motor_status;
     
+    bool touched;
+    
     SegwayStatus();
     
     std::string str();
@@ -123,9 +125,9 @@ public:
     /*!
      * Constructs the SegwayRMP object give the interface type.
      * 
-     * \param interface_type This must be can, usb, or serial.
+     * \param interface_type This must be can, usb, or serial. Default is usb.
      */
-    SegwayRMP(InterfaceType interface_type);
+    SegwayRMP(InterfaceType interface_type = usb);
     ~SegwayRMP();
     
     /*!
@@ -199,6 +201,7 @@ private:
     void startContinuousRead();
     void stopContinuousRead();
     void parsePacket(Packet &packet);
+    bool _parsePacket(Packet &packet, SegwayStatus &_segway_status);
     void executeCallback(SegwayStatus segway_status);
     void (*status_callback)(SegwayStatus &segway_status);
     void (*debug)(const std::string &msg);

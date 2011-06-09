@@ -37,6 +37,7 @@ SegwayStatus::SegwayStatus() {
     ui_battery_voltage, powerbase_battery_voltage, commanded_velocity,
     commanded_yaw_rate = 0.0;
     operational_mode, controller_gain_schedule, motor_status = 0;
+    touched = false;
 }
 
 std::string SegwayStatus::str() {
@@ -61,7 +62,6 @@ std::string SegwayStatus::str() {
         ss << "E-Stopped";
     return ss.str();
 }
-
 
 SegwayRMP::SegwayRMP(InterfaceType interface_type) {
     this->interface_type = interface_type;
@@ -307,66 +307,78 @@ inline int getInt(char byte_1, char byte_2, char byte_3, char byte_4) {
     return (int)(((int)byte_3<<24)|((int)byte_4<<16)|((int)byte_1<<8)|(int)byte_2);
 }
 
-void SegwayRMP::parsePacket(Packet &packet) {
-    if(packet.channel == 0xBB) // Ignore Channel B messages
-        return;
-    // printf("Packet id: %X, Packet Channel: %X, Packet Data: ", packet.id, packet.channel);
-    //     printHex(reinterpret_cast<char *>(packet.data), 8);
-    
+bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
     bool status_updated = false;
+    if(packet.channel == 0xBB) // Ignore Channel B messages
+        return status_updated;
     
     // This section comes largerly from the Segway example code
     switch (packet.id) {
         case 0x0400: // COMMAND REQUEST
             break;
         case 0x0401:
-            this->segway_status.pitch      = getShortInt(packet.data[0], packet.data[1])/7.8;
-            this->segway_status.pitch_rate = getShortInt(packet.data[2], packet.data[3])/7.78;
-            this->segway_status.roll       = getShortInt(packet.data[4], packet.data[5])/7.78;
-            this->segway_status.roll_rate  = getShortInt(packet.data[6], packet.data[7])/7.78;
+            _segway_status.pitch      = getShortInt(packet.data[0], packet.data[1])/7.8;
+            _segway_status.pitch_rate = getShortInt(packet.data[2], packet.data[3])/7.78;
+            _segway_status.roll       = getShortInt(packet.data[4], packet.data[5])/7.78;
+            _segway_status.roll_rate  = getShortInt(packet.data[6], packet.data[7])/7.78;
+            _segway_status.touched = true;
             break;
         case 0x0402:
-            this->segway_status.left_wheel_speed  = getShortInt(packet.data[0], packet.data[1])/332.0;
-            this->segway_status.right_wheel_speed = getShortInt(packet.data[0], packet.data[1])/332.0;
-            this->segway_status.yaw_rate          = getShortInt(packet.data[0], packet.data[1])/7.8;
-            this->segway_status.servo_frames      = ((((packet.data[6] & 0x0ff) << 8) | (packet.data[7] & 0x0ff)) & 0x0ffff)*0.01;
+            _segway_status.left_wheel_speed  = getShortInt(packet.data[0], packet.data[1])/332.0;
+            _segway_status.right_wheel_speed = getShortInt(packet.data[0], packet.data[1])/332.0;
+            _segway_status.yaw_rate          = getShortInt(packet.data[0], packet.data[1])/7.8;
+            _segway_status.servo_frames      = ((((packet.data[6] & 0x0ff) << 8) | (packet.data[7] & 0x0ff)) & 0x0ffff)*0.01;
+            _segway_status.touched = true;
             break;
         case 0x0403:
-            this->segway_status.integrated_left_wheel_position  = 
+            _segway_status.integrated_left_wheel_position  = 
                                             getInt(packet.data[0], packet.data[1], packet.data[2], packet.data[3])/33215.0;
-            this->segway_status.integrated_right_wheel_position = 
+            _segway_status.integrated_right_wheel_position = 
                                             getInt(packet.data[4], packet.data[5], packet.data[6], packet.data[7])/33215.0;
+            _segway_status.touched = true;
             break;
         case 0x0404:
-            this->segway_status.integrated_forward_position = 
+            _segway_status.integrated_forward_position = 
                                             getInt(packet.data[0], packet.data[1], packet.data[2], packet.data[3])/33215.0;
-            this->segway_status.integrated_turn_position    = 
+            _segway_status.integrated_turn_position    = 
                                             getInt(packet.data[4], packet.data[5], packet.data[6], packet.data[7])/112644.0;
+            _segway_status.touched = true;
             break;
         case 0x0405:
-            this->segway_status.left_motor_torque  = getShortInt(packet.data[0], packet.data[1])/1094.0;
-            this->segway_status.right_motor_torque = getShortInt(packet.data[0], packet.data[1])/1094.0;
+            _segway_status.left_motor_torque  = getShortInt(packet.data[0], packet.data[1])/1094.0;
+            _segway_status.right_motor_torque = getShortInt(packet.data[0], packet.data[1])/1094.0;
+            _segway_status.touched = true;
             break;
         case 0x0406:
-            this->segway_status.operational_mode          = OperationalMode(getShortInt(packet.data[0], packet.data[1]));
-            this->segway_status.controller_gain_schedule  = ControllerGainSchedule(getShortInt(packet.data[0], packet.data[1]));
-            this->segway_status.ui_battery_voltage        = ((((packet.data[4] & 0x0ff) << 8) | (packet.data[5] & 0x0ff)) & 0x0ffff)*0.0125 + 1.4;
-            this->segway_status.powerbase_battery_voltage = ((((packet.data[6] & 0x0ff) << 8) | (packet.data[7] & 0x0ff)) & 0x0ffff)/4.0;
+            _segway_status.operational_mode          = OperationalMode(getShortInt(packet.data[0], packet.data[1]));
+            _segway_status.controller_gain_schedule  = ControllerGainSchedule(getShortInt(packet.data[0], packet.data[1]));
+            _segway_status.ui_battery_voltage        = ((((packet.data[4] & 0x0ff) << 8) | (packet.data[5] & 0x0ff)) & 0x0ffff)*0.0125 + 1.4;
+            _segway_status.powerbase_battery_voltage = ((((packet.data[6] & 0x0ff) << 8) | (packet.data[7] & 0x0ff)) & 0x0ffff)/4.0;
+            _segway_status.touched = true;
             break;
         case 0x0407:
-            this->segway_status.commanded_velocity = (float)getShortInt(packet.data[0], packet.data[1])/MPS_TO_COUNTS;
-            this->segway_status.commanded_yaw_rate = (float)getShortInt(packet.data[0], packet.data[1])/1024.0;
+            _segway_status.commanded_velocity = (float)getShortInt(packet.data[0], packet.data[1])/MPS_TO_COUNTS;
+            _segway_status.commanded_yaw_rate = (float)getShortInt(packet.data[0], packet.data[1])/1024.0;
             status_updated = true;
+            _segway_status.touched = true;
             break;
         case 0x0680:
             if(packet.data[3] == 0x80) // Motors Enabled
-                this->segway_status.motor_status = 1;
+                _segway_status.motor_status = 1;
             else // E-Stopped
-                this->segway_status.motor_status = 0;
+                _segway_status.motor_status = 0;
+            _segway_status.touched = true;
             break;
         default: // Unknown/Unhandled Message
             break;
     };
+    return status_updated;
+}
+
+void SegwayRMP::parsePacket(Packet &packet) {
+    bool status_updated = false;
+    
+    status_updated = this->_parsePacket(packet, this->segway_status);
     
     // Messages come in order 0x0400, 0x0401, ... 0x0407 so a complete "cycle" of information has been sent every time we get an 0x0407
     if(status_updated) {
