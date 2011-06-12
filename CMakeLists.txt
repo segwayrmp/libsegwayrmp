@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.4.6)
 
 project(segwayrmp)
 
+OPTION(SEGWAYRMP_BUILD_TESTS "Build all of the SegwayRMP tests." OFF)
+OPTION(SEGWAYRMP_BUILD_EXAMPLES "Build all of the SegwayRMP examples." OFF)
+
 set(BUILD_SHARED_LIBS OFF)
 
 SET(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
@@ -38,23 +41,30 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 # Compile the libsegway Library
 add_library(segwayrmp src/segwayrmp.cpp include/segwayrmp.h src/rmp_io.cpp include/rmp_io.h)
-target_link_libraries(segwayrmp ${serial_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
+target_link_libraries(segwayrmp ${serial_LIBRARIES}
+                                ${Boost_SYSTEM_LIBRARY}
+                                ${Boost_FILESYSTEM_LIBRARY}
+                                ${Boost_THREAD_LIBRARY})
 
+IF(SEGWAYRMP_BUILD_EXAMPLES)
 # Compile the Example program
 add_executable(segwayrmp_example examples/segwayrmp_example.cpp)
 # Link the Test program to the Serial library
 target_link_libraries(segwayrmp_example segwayrmp)
+ENDIF(SEGWAYRMP_BUILD_EXAMPLES)
 
-# Find Google Test                                                                                                                                                               
-enable_testing()
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-
-# Compile the Test program
-add_executable(segwayrmp_tests test/segwayrmp_tests.cpp)
-# Link the Test program to the segwayrmp library
-target_link_libraries(segwayrmp_tests segwayrmp ${GTEST_BOTH_LIBRARIES})
-add_test(AllTestsIntest_serial segwayrmp_tests)
+IF(SEGWAYRMP_BUILD_TESTS)
+    # Find Google Test                                                                                                                                                               
+    enable_testing()
+    find_package(GTest REQUIRED)
+    include_directories(${GTEST_INCLUDE_DIRS})
+    
+    # Compile the Test program
+    add_executable(segwayrmp_tests test/segwayrmp_tests.cpp)
+    # Link the Test program to the segwayrmp library
+    target_link_libraries(segwayrmp_tests segwayrmp ${GTEST_BOTH_LIBRARIES})
+    add_test(AllTestsIntest_serial segwayrmp_tests)
+ENDIF(SEGWAYRMP_BUILD_TESTS)
 
 # Configure make install
 IF(NOT CMAKE_INSTALL_PREFIX)
