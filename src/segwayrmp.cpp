@@ -384,8 +384,8 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
 void SegwayRMP::parsePacket(Packet &packet) {
     bool status_updated = false;
     
-    printf("Packet id: %X, Packet Channel: %X, Packet Data: ", packet.id, packet.channel);
-    printHex(reinterpret_cast<char *>(packet.data), 8);
+    //printf("Packet id: %X, Packet Channel: %X, Packet Data: ", packet.id, packet.channel);
+    //printHex(reinterpret_cast<char *>(packet.data), 8);
     
     status_updated = this->_parsePacket(packet, this->segway_status);
     
