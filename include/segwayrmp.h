@@ -37,6 +37,8 @@
 
 #include <sstream>
 
+#include <math.h>
+
 #include "rmp_io.h"
 
 namespace segwayrmp {
@@ -53,6 +55,15 @@ namespace segwayrmp {
  *                 1          8 milesperhr
  */
 static double MPS_TO_COUNTS = (1.0/1000.0)*(1.0/1.609)*(3600.0/1.0)*(1176.0/8.0);
+
+/*!
+ * Converts Radians per Second to Counts to be sent to the segway.
+ *
+ *           X Radians    180 degrees   7.8 counts * second
+ * Command = --------- * ------------ * -------------------
+ *            second      pi radians         degree 
+ */
+static double RPS_TO_COUNTS = (180.0/M_PI)*(7.8);
 
 /*!
  * Defines the possible modes of communication for the Segway Interface.
@@ -190,6 +201,16 @@ public:
       * \todo Add individual functions for reseting each integrator.
       */
      void resetAllIntegrators();
+     
+     /*!
+      * Sets the Max Velocity Scale Factor
+      *
+      * \param scalar This is a value between 0.0 and 1.0 which will set the
+      * scale factor on the segway internally for all velocity commands.
+      * Values larger than 1.0 will round down to 1.0 and values < 0 will round
+      * up to 0.0. Parameter defaults to 1.0.
+      */
+     void setMaxVelocityScaleFactor(double scalar = 1.0);
      
      void setStatusCallback(void (*status_callback)(SegwayStatus &segway_status));
      

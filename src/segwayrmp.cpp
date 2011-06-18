@@ -105,6 +105,9 @@ void SegwayRMP::connect(OperationalMode operational_mode, ControllerGainSchedule
     this->setOperationalMode(operational_mode);
     this->setControllerGainSchedule(controller_gain_schedule);
     
+    // Set the scale factor to 1.0 by default
+    this->setMaxVelocityScaleFactor();
+    
     // Reset all the integrators
     this->resetAllIntegrators();
 }
@@ -253,6 +256,40 @@ void SegwayRMP::resetAllIntegrators() {
         
     } catch(std::exception &e) {
         throw(ConfigurationException("Integrators", e.what()));
+    }
+}
+
+void SegwayRMP::setMaxVelocityScaleFactor(double scalar) {
+    // Ensure we are connected
+    if(!this->connected)
+        throw(ConfigurationException("Max Velocity Scale Factor", "Not Connected."));
+    try {
+        Packet packet;
+        
+        packet.id = 0x0413;
+        
+        packet.data[0] = 0x00;
+        packet.data[1] = 0x00;
+        packet.data[2] = 0x00;
+        packet.data[3] = 0x00;
+        packet.data[4] = 0x00;
+        packet.data[5] = 0x0A;
+        packet.data[6] = 0x00;
+        
+        if (scalar < 0.0)
+            scalar = 0.0;
+        if (scalar > 1.0)
+            scalar = 1.0;
+        scalar *= 16.0;
+        scalar = floor(scalar);
+        
+        short int scalar_int = (short int)scalar;
+        
+        packet.data[7] = (unsigned char)(scalar_int & 0xFF00);
+        
+        this->rmp_io->sendPacket(packet);
+    } catch(std::exception &e) {
+        throw(ConfigurationException("Max Velocity Scale Factor", e.what()));
     }
 }
 
