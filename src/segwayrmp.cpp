@@ -107,7 +107,7 @@ void SegwayRMP::connect(OperationalMode operational_mode, ControllerGainSchedule
     
     // Set the scale factor to 1.0 by default
     this->setMaxVelocityScaleFactor();
-    
+
     // Reset all the integrators
     this->resetAllIntegrators();
 }
@@ -282,10 +282,10 @@ void SegwayRMP::setMaxVelocityScaleFactor(double scalar) {
             scalar = 1.0;
         scalar *= 16.0;
         scalar = floor(scalar);
-        
+
         short int scalar_int = (short int)scalar;
-        
-        packet.data[7] = (unsigned char)(scalar_int & 0xFF00);
+
+        packet.data[7] = (unsigned char)(scalar_int & 0x00FF);
         
         this->rmp_io->sendPacket(packet);
     } catch(std::exception &e) {

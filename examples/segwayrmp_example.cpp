@@ -1,7 +1,7 @@
 #include "segwayrmp.h"
 
 void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
-    ;
+    std::cout << ss.str() << std::endl << std::endl;
 }
 
 int main(void) {
