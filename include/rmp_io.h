@@ -29,10 +29,9 @@
  *
  * @section DESCRIPTION
  *
- * This provides different I/O methods for communicating with the RMP.
+ * This provides an abstract I/O interface for communicating with the RMP.
  * 
- * This library depends on a Boost based Serial library: https://github.com/wjwwood/serial
- * and Boost: http://www.boost.org/
+ * This library depends on Boost: http://www.boost.org/
  */
 
 #ifndef RMP_IO_H
@@ -41,8 +40,6 @@
 #include <vector>
 
 #include <boost/thread.hpp>
-
-#include "serial.h"
 
 namespace segwayrmp {
 
@@ -68,47 +65,17 @@ public:
     // Must be implemented by child class
     virtual int write(unsigned char* buffer, int size) = 0;
     
-    virtual void configure(std::string port, int baudrate) = 0;
-    
-    virtual void getPacket(Packet &packet) = 0;
-    
-    virtual void sendPacket(Packet &packet) = 0;
-    
-    bool isConnected() {return this->connected;}
-    
-protected:
-    bool connected;
-};
-
-class SerialRMPIO : public RMPIO {
-public:
-    SerialRMPIO();
-    ~SerialRMPIO();
-    
-    void connect();
-    
-    void disconnect();
-    
-    int read(unsigned char* buffer, int size);
-    
-    int write(unsigned char* buffer, int size);
-    
-    void configure(std::string port, int baudrate);
-    
     void getPacket(Packet &packet);
     
     void sendPacket(Packet &packet);
+    
+    bool isConnected() {return this->connected;}
     
 protected:
     void fillBuffer();
     unsigned char computeChecksum(unsigned char* usb_packet);
     
-    bool configured;
-    
-    std::string port;
-    int baudrate;
-    
-    serial::Serial serial_port;
+    bool connected;
     
     std::vector<unsigned char> data_buffer;
 };

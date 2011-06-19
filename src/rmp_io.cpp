@@ -11,55 +11,9 @@ inline void printHex(char * data, int length) {
 using namespace segwayrmp;
 
 /////////////////////////////////////////////////////////////////////////////
-// SerialRMPIO
+// RMPIO
 
-SerialRMPIO::SerialRMPIO() : configured(false), baudrate(115200), port("") {
-    this->connected = false;
-}
-
-SerialRMPIO::~SerialRMPIO() {
-    this->disconnect();
-}
-
-void SerialRMPIO::configure(std::string port, int baudrate) {
-    this->port = port;
-    this->baudrate = baudrate;
-    this->configured = true;
-}
-
-void SerialRMPIO::connect() {
-    if(!this->configured) {
-        throw(ConnectionFailedException("The serial port must be configured before connecting!"));
-    }
-    try {
-        // Configure and open the serial port
-        this->serial_port.setPort(this->port);
-        this->serial_port.setBaudrate(this->baudrate);
-        this->serial_port.setTimeoutMilliseconds(1000);
-        this->serial_port.open();
-    } catch(std::exception &e) {
-        throw(ConnectionFailedException(e.what()));
-    }
-    this->connected = true;
-}
-
-void SerialRMPIO::disconnect() {
-    if(this->connected) {
-        if(this->serial_port.isOpen())
-            this->serial_port.close();
-        this->connected = false;
-    }
-}
-
-int SerialRMPIO::read(unsigned char* buffer, int size) {
-    return this->serial_port.read(reinterpret_cast<char*>(buffer), size);
-}
-
-int SerialRMPIO::write(unsigned char* buffer, int size) {
-    return this->serial_port.write(reinterpret_cast<char*>(buffer), size);
-}
-
-void SerialRMPIO::getPacket(Packet &packet) {
+void RMPIO::getPacket(Packet &packet) {
     if(!this->connected)
         throw(PacketRetrievalException(1, "Not connected."));
     
@@ -147,7 +101,7 @@ void SerialRMPIO::getPacket(Packet &packet) {
     return;
 }
 
-void SerialRMPIO::sendPacket(Packet &packet) {
+void RMPIO::sendPacket(Packet &packet) {
     unsigned char usb_packet[18] = {0xF0, 0x55, 0x00, 0x00, 0x00, 0x00, 0x04, 0x13, 0x00, 
                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     // Set the desitnation channel, 0x01 for 0xAA and 0x02 for 0xBB
@@ -162,7 +116,7 @@ void SerialRMPIO::sendPacket(Packet &packet) {
     this->write(usb_packet, 18);
 }
 
-void SerialRMPIO::fillBuffer() {
+void RMPIO::fillBuffer() {
     unsigned char buffer[BUFFER_SIZE];
     // Read up to BUFFER_SIZE what ever is needed to fill the vector to BUFFER_SIZE
     int bytes_read = this->read(buffer, BUFFER_SIZE-this->data_buffer.size());
@@ -170,7 +124,7 @@ void SerialRMPIO::fillBuffer() {
     this->data_buffer.insert(this->data_buffer.end(), buffer, buffer+bytes_read);
 }
 
-unsigned char SerialRMPIO::computeChecksum(unsigned char* usb_packet) {
+unsigned char RMPIO::computeChecksum(unsigned char* usb_packet) {
     unsigned short checksum = 0;
     unsigned short checksum_hi = 0;
     
