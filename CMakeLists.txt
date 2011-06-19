@@ -8,11 +8,11 @@ project(segwayrmp)
 option(SEGWAYRMP_BUILD_TESTS "Build all of the SegwayRMP tests." OFF)
 option(SEGWAYRMP_BUILD_EXAMPLES "Build all of the SegwayRMP examples." OFF)
 option(SEGWAYRMP_USE_SERIAL "Build the library with serial support, requires http://github.com/wjwwood/serial/ ." ON)
-option(SEGWAYRMP_USE_FTD2XX "Build the library with FTD2XX support, requires http://www.ftdichip.com/Drivers/D2XX.htm" ON)
+option(SEGWAYRMP_USE_FTD2XX "Build the library with FTD2XX support, requires http://www.ftdichip.com/Drivers/D2XX.htm" OFF)
 
 # Check to make sure at least one implementation is on
 IF(NOT SEGWAYRMP_USE_SERIAL AND NOT SEGWAYRMP_USE_FTD2XX)
-    message(FATAL_ERROR "You must select at least one implementation (Serial or FTD2XX).")
+    message(FATAL_ERROR "libsegwayrmp: You must select at least one implementation (Serial or FTD2XX).")
 ENDIF(NOT SEGWAYRMP_USE_SERIAL AND NOT SEGWAYRMP_USE_FTD2XX)
 
 # Allow for building shared libs override
@@ -67,9 +67,10 @@ IF(SEGWAYRMP_USE_SERIAL)
     
     # Check that serial was found
     IF(NOT serial_FOUND)
-        message("Serial library not found, serial support will not be built.")
+        message("libsegwayrmp: Serial library not found, serial support will not be built.")
     ELSE(NOT serial_FOUND)
         set(SEGWAYRMP_IMPL_FOUND TRUE)
+        message("--  libsegwayrmp: Serial enabled and library found, building with serial support.")
     ENDIF(NOT serial_FOUND)
     
     include_directories(${serial_INCLUDE_DIRS})
@@ -94,9 +95,10 @@ IF(SEGWAYRMP_USE_FTD2XX)
     ENDIF(FTD2XX_INCLUDE_DIR AND FTD2XX_LIBRARIES)
     
     IF(NOT FTD2XX_FOUND)
-        message("FTD2XX library not found, FTD2XX usb support will not be built.")
+        message("libsegwayrmp: FTD2XX library not found, FTD2XX usb support will not be built.")
     ELSE(NOT FTD2XX_FOUND)
         set(SEGWAYRMP_IMPL_FOUND TRUE)
+        message("--  libsegwayrmp: FTD2XX enabled and library found, building with FTD2XX usb support.")
     ENDIF(NOT FTD2XX_FOUND)
     
     include_directories(FTD2XX_INCLUDE_DIR)
@@ -106,18 +108,29 @@ IF(SEGWAYRMP_USE_FTD2XX)
     list(APPEND SEGWAYRMP_SRCS src/impl/rmp_ftd2xx.cpp)
     
     list(APPEND SEGWAYRMP_HEADERS include/impl/rmp_ftd2xx.h)
+    
+    set_target_properties(segwayrmp PROPERTIES COMPILE_DEFINITIONS SEGWAYRMP_FTD2XX_SUPPORT)
 ENDIF(SEGWAYRMP_USE_FTD2XX)
 
 ## Build the library
 
 # Ensure at least one implementation is available
 IF(NOT SEGWAYRMP_IMPL_FOUND)
-    message(FATAL_ERROR "No implementation can be built and so the library cannot communicate, failing.")
+    message(FATAL_ERROR "libsegwayrmp: No implementation can be built and so the library cannot communicate, failing.")
 ENDIF(NOT SEGWAYRMP_IMPL_FOUND)
 
 # Compile the libsegway Library
 add_library(segwayrmp ${SEGWAYRMP_SRCS})
 target_link_libraries(segwayrmp ${SEGWAYRMP_LINK_LIBS})
+
+# Add C++ Preprocessor Flags
+IF(SEGWAYRMP_USE_SERIAL)
+    set_target_properties(segwayrmp PROPERTIES COMPILE_DEFINITIONS SEGWAYRMP_SERIAL_SUPPORT)
+ENDIF(SEGWAYRMP_USE_SERIAL)
+
+IF(SEGWAYRMP_USE_FTD2XX)
+    set_target_properties(segwayrmp PROPERTIES COMPILE_DEFINITIONS SEGWAYRMP_FTD2XX_SUPPORT)
+ENDIF(SEGWAYRMP_USE_FTD2XX)
 
 ## Build Examples
 

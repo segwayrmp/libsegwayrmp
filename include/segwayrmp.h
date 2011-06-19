@@ -41,6 +41,14 @@
 
 #include "rmp_io.h"
 
+#ifdef SEGWAYRMP_SERIAL_SUPPORT
+#include "rmp_serial.h"
+#endif
+
+#ifdef SEGWAYRMP_FTD2XX_SUPPORT
+#include "rmp_ftd2xx.h"
+#endif
+
 namespace segwayrmp {
 
 /*!
@@ -142,14 +150,12 @@ public:
     ~SegwayRMP();
     
     /*!
-     * Configures the interface, for serial only ATM.
-     * 
-     * In the future this function will accomodate or change based on the connection type (serial, usb, or can).
+     * Configures the serial interface, if the library is built with serial support, otherwise throws ConfigurationException.
      * 
      * \param port Defines which serial port to connect to in serial mode.
      * \param baudrate Defines the speed of the serial port in baud's.  Defaults to 460800 (recommended).
      */
-    void configure(std::string port, int baudrate = 460800);
+    void configureSerial(std::string port, int baudrate = 460800);
     
     /*!
      * Connects to the Segway.

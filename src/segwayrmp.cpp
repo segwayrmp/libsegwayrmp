@@ -65,7 +65,21 @@ std::string SegwayStatus::str() {
 
 SegwayRMP::SegwayRMP(InterfaceType interface_type) {
     this->interface_type = interface_type;
-    this->rmp_io = new SerialRMPIO();
+    if (this->interface_type == serial) {
+        #ifdef SEGWAYRMP_SERIAL_SUPPORT
+        this->rmp_io = new SerialRMPIO();
+        #else
+        throw(ConfigurationException("InterfaceType", "The segwayrmp library is not built with serial support, but serial was specified."));
+        #endif
+    } else if (this->interface_type == usb) {
+        #ifdef SEGWAYRMP_FTD2XX_SUPPORT
+        this->rmp_io = new FTD2XXRMPIO();
+        #else
+        throw(ConfigurationException("InterfaceType", "The segwayrmp library is not built with ftd2xx usb support, but usb was specified."));
+        #endif
+    } else {
+        throw(ConfigurationException("InterfaceType", "The specified interface type is not supported or invalid."));
+    }
     this->callback_execution_thread_status = false;
     
     this->status_callback = defaultSegwayStatusCallback;
@@ -77,12 +91,21 @@ SegwayRMP::SegwayRMP(InterfaceType interface_type) {
 SegwayRMP::~SegwayRMP() {
     if(this->continuous)
         this->stopContinuousRead();
+    delete this->rmp_io;
 }
 
-void SegwayRMP::configure(std::string port, int baudrate) {
+void SegwayRMP::configureSerial(std::string port, int baudrate) {
+    #ifdef SEGWAYRMP_SERIAL_SUPPORT
     if(this->interface_type == serial) {
-        this->rmp_io->configure(port, baudrate);
+        SerialRMPIO * serial_rmp = (SerialRMPIO*)(this->rmp_io);
+        serial_rmp->configure(port, baudrate);
+        serial_rmp = NULL;
+    } else {
+        throw(ConfigurationException("configureSerial", "Cannot configure serial when the InterfaceType is not serial."));
     }
+    #else
+    throw(ConfigurationException("configureSerial", "The segwayrmp library is not build with serial support, not implemented."));
+    #endif
 }
 
 void SegwayRMP::connect(OperationalMode operational_mode, ControllerGainSchedule controller_gain_schedule) {

@@ -35,6 +35,9 @@
  * and Boost: http://www.boost.org/
  */
 
+#ifndef RMP_SERIAL_H
+#define RMP_SERIAL_H
+
 #include "../rmp_io.h"
 
 #include "serial.h"
@@ -66,3 +69,5 @@ protected:
 };
 
 }
+
+#endif
