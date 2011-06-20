@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include <string.h>
 
 #include "segwayrmp.h"
@@ -15,7 +15,7 @@ int run_segway(segwayrmp::InterfaceType interface_type, std::string port = "/dev
     rmp.setStatusCallback(handleSegwayStatus);
     rmp.connect();
     while(true) {
-        rmp.move(1.0, 0);
+        rmp.move(0.3, 0);
         usleep(100000);
     }
 }
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
         print_usage();
         return 0;
     }
-    if (argv[1] == "serial") {
+    if (std::strcmp(argv[1], "serial") == 0) {
         if (argc < 3) {
             print_usage();
             return 0;
