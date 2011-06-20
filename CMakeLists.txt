@@ -62,7 +62,7 @@ set(SEGWAYRMP_LINK_LIBS ${Boost_SYSTEM_LIBRARY}
 IF(SEGWAYRMP_USE_SERIAL)
     # Find the Serial library
     IF(NOT serial_FOUND)
-        find_package(serial)
+        find_package(serial QUIET)
     ENDIF(NOT serial_FOUND)
     
     # Check that serial was found
@@ -72,7 +72,8 @@ IF(SEGWAYRMP_USE_SERIAL)
         set(SEGWAYRMP_IMPL_FOUND TRUE)
         message(STATUS "libsegwayrmp: Serial enabled and library found, building with serial support.")
     ENDIF(NOT serial_FOUND)
-    
+ENDIF(SEGWAYRMP_USE_SERIAL)
+IF(serial_FOUND)
     include_directories(${serial_INCLUDE_DIRS})
     
     list(APPEND SEGWAYRMP_LINK_LIBS ${serial_LIBRARIES})
@@ -80,7 +81,7 @@ IF(SEGWAYRMP_USE_SERIAL)
     list(APPEND SEGWAYRMP_SRCS src/impl/rmp_serial.cpp)
     
     list(APPEND SEGWAYRMP_HEADERS include/impl/rmp_serial.h)
-ENDIF(SEGWAYRMP_USE_SERIAL)
+ENDIF(serial_FOUND)
 
 ## FTD2XX implementation setup
 
@@ -90,17 +91,24 @@ IF(SEGWAYRMP_USE_FTD2XX)
     # Find the FTD2XX Library
     find_library(FTD2XX_LIBRARIES NAMES ftd2xx PATHS /usr/lib /usr/local/lib)
     
-    IF(FTD2XX_INCLUDE_DIR AND FTD2XX_LIBRARIES)
-        set(FTD2XX_FOUND TRUE)
-    ENDIF(FTD2XX_INCLUDE_DIR AND FTD2XX_LIBRARIES)
+    set(FTD2XX_FOUND TRUE)
     
+    IF(NOT FTD2XX_INCLUDE_DIR)
+        set(FTD2XX_FOUND FALSE)
+    ENDIF(NOT FTD2XX_INCLUDE_DIR)
+
+    IF(NOT FTD2XX_LIBRARIES)
+        set(FTD2XX_FOUND FALSE)
+    ENDIF(NOT FTD2XX_LIBRARIES)
+
     IF(NOT FTD2XX_FOUND)
         message("libsegwayrmp: FTD2XX library not found, FTD2XX usb support will not be built.")
     ELSE(NOT FTD2XX_FOUND)
         set(SEGWAYRMP_IMPL_FOUND TRUE)
         message(STATUS "libsegwayrmp: FTD2XX enabled and library found, building with FTD2XX usb support.")
     ENDIF(NOT FTD2XX_FOUND)
-    
+ENDIF(SEGWAYRMP_USE_FTD2XX)
+IF(FTD2XX_FOUND)
     include_directories(${FTD2XX_INCLUDE_DIR})
     
     list(APPEND SEGWAYRMP_LINK_LIBS ${FTD2XX_LIBRARIES})
@@ -108,7 +116,7 @@ IF(SEGWAYRMP_USE_FTD2XX)
     list(APPEND SEGWAYRMP_SRCS src/impl/rmp_ftd2xx.cpp)
     
     list(APPEND SEGWAYRMP_HEADERS include/impl/rmp_ftd2xx.h)
-ENDIF(SEGWAYRMP_USE_FTD2XX)
+ENDIF(FTD2XX_FOUND)
 
 ## Build the library
 
