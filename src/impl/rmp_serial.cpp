@@ -6,7 +6,7 @@ using namespace segwayrmp;
 /////////////////////////////////////////////////////////////////////////////
 // SerialRMPIO
 
-SerialRMPIO::SerialRMPIO() : configured(false), baudrate(115200), port("") {
+SerialRMPIO::SerialRMPIO() : configured(false), baudrate(460800), port("") {
     this->connected = false;
 }
 

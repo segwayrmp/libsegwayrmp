@@ -30,6 +30,11 @@
  * \section DESCRIPTION
  *
  * This provides a cross platform interface for the Segway RMP's.
+ * 
+ * This library depends on Boost: http://www.boost.org/
+ * and possibly depends on a Serial library: https://github.com/wjwwood/serial
+ * and possibly depends on the FTD2XX driver: http://www.ftdichip.com/Drivers/D2XX.htm
+ * depending on the library build configuration.
  */
  
 #ifndef SEGWAYRMP_H
@@ -158,6 +163,31 @@ public:
     void configureSerial(std::string port, int baudrate = 460800);
     
     /*!
+     * Configures the FTD2XX usb interface, if the library is built with usb support, otherwise throws ConfigurationException.
+     * 
+     * \param serial_number Defines which usb port to connect to based on the devices serial number.
+     * \param baudrate Defines the speed of the usb port in baud's.  Defaults to 460800 (recommended).
+     */
+    void configureUSBBySerial(std::string serial_number, int baudrate = 460800);
+    
+    /*!
+     * Configures the FTD2XX usb interface, if the library is built with usb support, otherwise throws ConfigurationException.
+     * 
+     * \param description Defines which usb port to connect to based on the devices description.
+     * \param baudrate Defines the speed of the usb port in baud's.  Defaults to 460800 (recommended).
+     */
+    void configureUSBByDescription(std::string description, int baudrate = 460800);
+    
+    /*!
+     * Configures the FTD2XX usb interface, if the library is built with usb support, otherwise throws ConfigurationException.
+     * 
+     * \param device_index Defines which usb port to connect to based on the devices index.
+     *              Note: This is indexed by all ftd2xx devices on the system.
+     * \param baudrate Defines the speed of the usb port in baud's.  Defaults to 460800 (recommended).
+     */
+    void configureUSBByIndex(int device_index, int baudrate = 460800);
+    
+    /*!
      * Connects to the Segway.
      * 
      * \param operational_mode Defines the operation mode of the segway, this must be tractor or balanced to 
@@ -218,6 +248,7 @@ public:
       */
      void setMaxVelocityScaleFactor(double scalar = 1.0);
      
+     // TODO: Make all the callbacks capable of taking class methods
      void setStatusCallback(void (*status_callback)(SegwayStatus &segway_status));
      
      void setDebugMsgCallback(void (*f)(const std::string &msg));
@@ -268,6 +299,30 @@ public:
     virtual const char* what() const throw() {
         std::stringstream ss;
         ss << "Error connecting to SegwayRMP: " << this->e_what;
+        return ss.str().c_str();
+    }
+};
+
+class ReadFailedException : public std::exception {
+    const char * e_what;
+public:
+    ReadFailedException(const char * e_what) {this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        std::stringstream ss;
+        ss << "Error reading from the SegwayRMP: " << this->e_what;
+        return ss.str().c_str();
+    }
+};
+
+class WriteFailedException : public std::exception {
+    const char * e_what;
+public:
+    WriteFailedException(const char * e_what) {this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        std::stringstream ss;
+        ss << "Error writing to the SegwayRMP: " << this->e_what;
         return ss.str().c_str();
     }
 };

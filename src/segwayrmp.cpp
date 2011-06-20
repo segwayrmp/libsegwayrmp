@@ -108,6 +108,48 @@ void SegwayRMP::configureSerial(std::string port, int baudrate) {
     #endif
 }
 
+void SegwayRMP::configureUSBBySerial(std::string serial_number, int baudrate) {
+    #ifdef SEGWAYRMP_FTD2XX_SUPPORT
+    if(this->interface_type == usb) {
+        FTD2XXRMPIO * ftd2xx_rmp = (FTD2XXRMPIO*)(this->rmp_io);
+        ftd2xx_rmp->configureUSBBySerial(serial_number, baudrate);
+        ftd2xx_rmp = NULL;
+    } else {
+        throw(ConfigurationException("configureUSBBySerial", "Cannot configure ftd2xx usb when the InterfaceType is not usb."));
+    }
+    #else
+    throw(ConfigurationException("configureUSBBySerial", "The segwayrmp library is not build with ftd2xx usb support, not implemented."));
+    #endif
+}
+
+void SegwayRMP::configureUSBByDescription(std::string description, int baudrate) {
+    #ifdef SEGWAYRMP_FTD2XX_SUPPORT
+    if(this->interface_type == usb) {
+        FTD2XXRMPIO * ftd2xx_rmp = (FTD2XXRMPIO*)(this->rmp_io);
+        ftd2xx_rmp->configureUSBByDescription(description, baudrate);
+        ftd2xx_rmp = NULL;
+    } else {
+        throw(ConfigurationException("configureUSBByDescription", "Cannot configure ftd2xx usb when the InterfaceType is not usb."));
+    }
+    #else
+    throw(ConfigurationException("configureUSBByDescription", "The segwayrmp library is not build with ftd2xx usb support, not implemented."));
+    #endif
+}
+
+void SegwayRMP::configureUSBByIndex(int device_index, int baudrate) {
+    #ifdef SEGWAYRMP_FTD2XX_SUPPORT
+    if(this->interface_type == usb) {
+        FTD2XXRMPIO * ftd2xx_rmp = (FTD2XXRMPIO*)(this->rmp_io);
+        ftd2xx_rmp->configureUSBByIndex(device_index, baudrate);
+        ftd2xx_rmp = NULL;
+    } else {
+        throw(ConfigurationException("configureUSBByIndex", "Cannot configure ftd2xx usb when the InterfaceType is not usb."));
+    }
+    #else
+    throw(ConfigurationException("configureUSBByIndex", "The segwayrmp library is not build with ftd2xx usb support, not implemented."));
+    #endif
+}
+
 void SegwayRMP::connect(OperationalMode operational_mode, ControllerGainSchedule controller_gain_schedule) {
     // Connect to the interface
     this->rmp_io->connect();

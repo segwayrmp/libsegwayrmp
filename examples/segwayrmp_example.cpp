@@ -7,10 +7,26 @@ void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
     std::cout << ss.str() << std::endl << std::endl;
 }
 
-int run_segway(segwayrmp::InterfaceType interface_type, std::string port = "/dev/ttyUSB0") {
+int run_segway(segwayrmp::InterfaceType interface_type, std::string configuration, int config_type = 0) {
     segwayrmp::SegwayRMP rmp(interface_type);
     if (interface_type == segwayrmp::serial) {
-        rmp.configureSerial(port);
+        rmp.configureSerial(configuration);
+    } else if (interface_type == segwayrmp::usb) {
+        switch (config_type) {
+            case 1:
+                rmp.configureUSBBySerial(configuration);
+                break;
+            case 2:
+                rmp.configureUSBByDescription(configuration);
+                break;
+            case 3:
+                rmp.configureUSBByIndex(atoi(configuration.c_str()));
+                break;
+            case 0:
+            default:
+                std::cout << "Invalid interface type provided." << std::endl;
+                return 0;
+        }
     }
     rmp.setStatusCallback(handleSegwayStatus);
     rmp.connect();
@@ -21,9 +37,13 @@ int run_segway(segwayrmp::InterfaceType interface_type, std::string port = "/dev
 }
 
 void print_usage() {
-    std::cout << "Usage: segwayrmp_example usb" << std::endl;
+    std::cout << "Usage: segwayrmp_example usb <serial_number | description | index> <\"FT000001\" | \"Robotic Mobility Platform\" | 0>" << std::endl;
     std::cout << "       or" << std::endl;
     std::cout << "       segwayrmp_example serial <serial port>" << std::endl;
+    std::cout << "Examples:" << std::endl;
+    std::cout << "       segwayrmp_example usb serial_number \"FT000001\"" << std::endl;
+    std::cout << "       segwayrmp_example serial /dev/ttyUSB0" << std::endl;
+    std::cout << "       segwayrmp_example serial COM0" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -37,7 +57,24 @@ int main(int argc, char *argv[]) {
             return 0;
         }
         run_segway(segwayrmp::serial, std::string(argv[2]));
+    } else if (std::strcmp(argv[1], "usb") == 0) {
+        if (argc < 4) {
+            print_usage();
+            return 0;
+        }
+        
+        if (std::strcmp(argv[2], "serial_number") == 0) {
+            run_segway(segwayrmp::usb, std::string(argv[3]), 1);
+        } else if (std::strcmp(argv[2], "description") == 0) {
+            run_segway(segwayrmp::usb, std::string(argv[3]), 2);
+        } else if (std::strcmp(argv[2], "index") == 0) {
+            run_segway(segwayrmp::usb, std::string(argv[3]), 3);
+        } else {
+            print_usage();
+            return 0;
+        }
     } else {
-        run_segway(segwayrmp::usb);
+        print_usage();
+        return 0;
     }
 }

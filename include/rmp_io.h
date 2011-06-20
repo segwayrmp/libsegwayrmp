@@ -32,6 +32,9 @@
  * This provides an abstract I/O interface for communicating with the RMP.
  * 
  * This library depends on Boost: http://www.boost.org/
+ * and possibly depends on a Serial library: https://github.com/wjwwood/serial
+ * and possibly depends on the FTD2XX driver: http://www.ftdichip.com/Drivers/D2XX.htm
+ * depending on the library build configuration.
  */
 
 #ifndef RMP_IO_H

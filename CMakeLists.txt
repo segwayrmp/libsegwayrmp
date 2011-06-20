@@ -8,7 +8,7 @@ project(segwayrmp)
 option(SEGWAYRMP_BUILD_TESTS "Build all of the SegwayRMP tests." OFF)
 option(SEGWAYRMP_BUILD_EXAMPLES "Build all of the SegwayRMP examples." OFF)
 option(SEGWAYRMP_USE_SERIAL "Build the library with serial support, requires http://github.com/wjwwood/serial/ ." ON)
-option(SEGWAYRMP_USE_FTD2XX "Build the library with FTD2XX support, requires http://www.ftdichip.com/Drivers/D2XX.htm" OFF)
+option(SEGWAYRMP_USE_FTD2XX "Build the library with FTD2XX support, requires http://www.ftdichip.com/Drivers/D2XX.htm" ON)
 
 # Check to make sure at least one implementation is on
 IF(NOT SEGWAYRMP_USE_SERIAL AND NOT SEGWAYRMP_USE_FTD2XX)
@@ -70,7 +70,7 @@ IF(SEGWAYRMP_USE_SERIAL)
         message("libsegwayrmp: Serial library not found, serial support will not be built.")
     ELSE(NOT serial_FOUND)
         set(SEGWAYRMP_IMPL_FOUND TRUE)
-        message("--  libsegwayrmp: Serial enabled and library found, building with serial support.")
+        message(STATUS "libsegwayrmp: Serial enabled and library found, building with serial support.")
     ENDIF(NOT serial_FOUND)
     
     include_directories(${serial_INCLUDE_DIRS})
@@ -98,18 +98,16 @@ IF(SEGWAYRMP_USE_FTD2XX)
         message("libsegwayrmp: FTD2XX library not found, FTD2XX usb support will not be built.")
     ELSE(NOT FTD2XX_FOUND)
         set(SEGWAYRMP_IMPL_FOUND TRUE)
-        message("--  libsegwayrmp: FTD2XX enabled and library found, building with FTD2XX usb support.")
+        message(STATUS "libsegwayrmp: FTD2XX enabled and library found, building with FTD2XX usb support.")
     ENDIF(NOT FTD2XX_FOUND)
     
-    include_directories(FTD2XX_INCLUDE_DIR)
+    include_directories(${FTD2XX_INCLUDE_DIR})
     
-    list(APPEND SEGWAYRMP_LINK_LIBS FTD2XX_LIBRARIES)
+    list(APPEND SEGWAYRMP_LINK_LIBS ${FTD2XX_LIBRARIES})
     
     list(APPEND SEGWAYRMP_SRCS src/impl/rmp_ftd2xx.cpp)
     
     list(APPEND SEGWAYRMP_HEADERS include/impl/rmp_ftd2xx.h)
-    
-    set_target_properties(segwayrmp PROPERTIES COMPILE_DEFINITIONS SEGWAYRMP_FTD2XX_SUPPORT)
 ENDIF(SEGWAYRMP_USE_FTD2XX)
 
 ## Build the library
@@ -124,13 +122,13 @@ add_library(segwayrmp ${SEGWAYRMP_SRCS})
 target_link_libraries(segwayrmp ${SEGWAYRMP_LINK_LIBS})
 
 # Add C++ Preprocessor Flags
-IF(SEGWAYRMP_USE_SERIAL)
+IF(SEGWAYRMP_USE_SERIAL AND serial_FOUND)
     set_target_properties(segwayrmp PROPERTIES COMPILE_DEFINITIONS SEGWAYRMP_SERIAL_SUPPORT)
-ENDIF(SEGWAYRMP_USE_SERIAL)
+ENDIF(SEGWAYRMP_USE_SERIAL AND serial_FOUND)
 
-IF(SEGWAYRMP_USE_FTD2XX)
+IF(SEGWAYRMP_USE_FTD2XX AND FTD2XX_FOUND)
     set_target_properties(segwayrmp PROPERTIES COMPILE_DEFINITIONS SEGWAYRMP_FTD2XX_SUPPORT)
-ENDIF(SEGWAYRMP_USE_FTD2XX)
+ENDIF(SEGWAYRMP_USE_FTD2XX AND FTD2XX_FOUND)
 
 ## Build Examples
 
