@@ -55,22 +55,64 @@ typedef enum {
 
 class FTD2XXRMPIO : public RMPIO {
 public:
+    /*!
+     * Constructs the FTD2XXRMPIO object.
+     */
     FTD2XXRMPIO();
     ~FTD2XXRMPIO();
     
+    /*!
+     * Connects to the usb port if it has been configured. Can throw ConnectionFailedException.
+     */
     void connect();
     
+    /*!
+     * Disconnects from the usb port if it is open.
+     */
     void disconnect();
     
+    /*!
+     * Read Function, reads from the usb port.
+     * 
+     * \param buffer An unsigned char array for data to be read into.
+     * \param size The amount of data to be read.
+     * \return int Bytes read.
+     */
     int read(unsigned char* buffer, int size);
     
+    /*!
+     * Write Function, writes to the usb port.
+     * 
+     * \param buffer An unsigned char array of data to be written.
+     * \param size The amount of data to be written.
+     * \return int Bytes written.
+     */
     int write(unsigned char* buffer, int size);
     
-    void configureUSBBySerial(std::string serial_number, int baudrate = 460800);
+    /*!
+     * Configures the usb port using the devices Serial Number.
+     * 
+     * \param serial_number The serial number of the RMP device, something like '00000056'.
+     * \param baudrate The speed of the usb communication.
+     */
+    void configureUSBBySerial(std::string serial_number, int baudrate);
     
-    void configureUSBByDescription(std::string description, int baudrate = 460800);
+    /*!
+     * Configures the usb port using the devices Description.
+     * 
+     * \param description The description of the RMP device, something like 'Robotic Mobile Platform'.
+     * \param baudrate The speed of the usb communication.
+     */
+    void configureUSBByDescription(std::string description, int baudrate);
     
-    void configureUSBByIndex(unsigned int device_index, int baudrate = 460800);
+    /*!
+     * Configures the usb port using the devices index.
+     * 
+     * \param index The index of the FTDI, something like 0. 
+     * This is its index amoung all FTD2XX devices on the system.
+     * \param baudrate The speed of the usb communication.
+     */
+    void configureUSBByIndex(unsigned int device_index, int baudrate);
     
 private:
     void enumerateUSBDevices();

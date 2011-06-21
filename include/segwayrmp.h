@@ -109,34 +109,34 @@ typedef enum {
 } ControllerGainSchedule;
 
 /*!
- * Contains Information returned by the Segway RMP.
+ * Contains Status Information returned by the Segway RMP.
  */
 class SegwayStatus {
 public:
-    float pitch;
-    float pitch_rate;
-    float roll;
-    float roll_rate;
-    float left_wheel_speed;
-    float right_wheel_speed;
-    float yaw_rate;
-    float servo_frames;
-    float integrated_left_wheel_position;
-    float integrated_right_wheel_position;
-    float integrated_forward_position;
-    float integrated_turn_position;
-    float left_motor_torque;
-    float right_motor_torque;
-    float ui_battery_voltage;
-    float powerbase_battery_voltage;
-    OperationalMode operational_mode;
-    ControllerGainSchedule controller_gain_schedule;
-    float commanded_velocity;
-    float commanded_yaw_rate;
+    float pitch; /*!< Integrated Pitch in degrees. */
+    float pitch_rate; /*!< Current Pitch Aungular Velocity in degrees/second. */
+    float roll; /*!< Integrated Roll in degrees. */
+    float roll_rate; /*!< Current Roll Angular Velocity in degrees/second. */
+    float left_wheel_speed; /*!< Current Left Wheel Velocity in meters/second. */
+    float right_wheel_speed; /*!< Current Right Wheel Velocity in meters/second. */
+    float yaw_rate; /*!< Current Yaw Angular Velocity in degrees/second. */
+    float servo_frames; /*!< Current Servo Time in seconds (0.01 second intervals). */
+    float integrated_left_wheel_position; /*!< Integrated Left Wheel Position in meters. */
+    float integrated_right_wheel_position; /*!< Integrated Right Wheel Position in meters. */
+    float integrated_forward_position; /*!< Integrated Forward/Aft Displacement in meters. */
+    float integrated_turn_position; /*!< Integrated Yaw Angle in degrees. */
+    float left_motor_torque; /*!< Current Left Motor Torque in Newton-meters. */
+    float right_motor_torque; /*!< Current Right Motor Torque in Newton-meters. */
+    float ui_battery_voltage; /*!< Current UI Battery Voltage in Volts. */
+    float powerbase_battery_voltage; /*!< Current Powerbase Battery Voltage in Volts. */
+    OperationalMode operational_mode; /*!< Current Operational Mode one of {disabled, tractor, balanced, power_down}. */
+    ControllerGainSchedule controller_gain_schedule; /*!< Current Controller Gain Schedule (balance mode only) one of {light, tall, heavy}. */
+    float commanded_velocity; /*!< Current Commanded Velocity in meters/second. */
+    float commanded_yaw_rate; /*!< Current Commanded Angular Velocity in degrees/second. */
     
-    int motor_status;
+    int motor_status; /*!< Current Motor Status one of {Enabled = 1, Emergency-Stopped = 0}. */
     
-    bool touched;
+    bool touched; /*!< For Testing Only. */
     
     SegwayStatus();
     
@@ -149,7 +149,7 @@ public:
 class SegwayRMP {
 public:
     /*!
-     * Constructs the SegwayRMP object give the interface type.
+     * Constructs the SegwayRMP object given the interface type.
      * 
      * \param interface_type This must be can, usb, or serial. Default is usb.
      */
@@ -219,10 +219,10 @@ public:
     void setOperationalMode(OperationalMode operational_mode);
      
     /*!
-    * Sets the controller gain schedule.
-    * 
-    * \param controller_gain_schedule This sets the contoller gain schedule, possible values are light, tall, and heavy.
-    */
+     * Sets the controller gain schedule.
+     * 
+     * \param controller_gain_schedule This sets the contoller gain schedule, possible values are light, tall, and heavy.
+     */
     void setControllerGainSchedule(ControllerGainSchedule controller_gain_schedule);
     
     /*!
@@ -231,31 +231,127 @@ public:
      * \param state This allows you to specify whether you want lock or unlock balancing mode. 
      * True for locked and False for unlocked.  The default state is True.
      */
-     void setBalanceModeLocking(bool state = true);
-     
-     /*!
-      * Resets all of the integrators.
-      * 
-      * \todo Add individual functions for reseting each integrator.
-      */
-     void resetAllIntegrators();
-     
-     /*!
-      * Sets the Max Velocity Scale Factor
-      *
-      * \param scalar This is a value between 0.0 and 1.0 which will set the
-      * scale factor on the segway internally for all velocity commands.
-      * Values larger than 1.0 will round down to 1.0 and values < 0 will round
-      * up to 0.0. Parameter defaults to 1.0.
-      */
-     void setMaxVelocityScaleFactor(double scalar = 1.0);
-     
-     // TODO: Make all the callbacks capable of taking class methods
-     void setStatusCallback(void (*status_callback)(SegwayStatus &segway_status));
-     
-     void setDebugMsgCallback(void (*f)(const std::string &msg));
-     void setInfoMsgCallback(void (*f)(const std::string &msg));
-     void setErrorMsgCallback(void (*f)(const std::string &msg));
+    void setBalanceModeLocking(bool state = true);
+    
+    /*!
+     * Resets all of the integrators.
+     * 
+     * \todo Add individual functions for reseting each integrator.
+     */
+    void resetAllIntegrators();
+    
+    /*!
+     * Sets the Max Velocity Scale Factor
+     *
+     * \param scalar This is a value between 0.0 and 1.0 which will set the
+     * scale factor on the segway internally for all velocity commands.
+     * Values larger than 1.0 will round down to 1.0 and values < 0 will round
+     * up to 0.0. Parameter defaults to 1.0.
+     */
+    void setMaxVelocityScaleFactor(double scalar = 1.0);
+    
+    /*!
+     * Sets the Callback Function to be called on new Segway Status Updates.
+     * 
+     * The provided function must follow this prototype:
+     * 
+     *    void yourSegwayStatusCallback(segwayrmp::SegwayStatus &segway_status)
+     * 
+     * Here is an example:
+     * 
+     *    void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
+     *        std::cout << ss.str() << std::endl << std::endl;
+     *    }
+     * 
+     * And the resulting call to make it the callback:
+     * 
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setStatusCallback(handleSegwayStatus);
+     * 
+     * \param status_callback A function pointer to the callback to handle new 
+     * SegwayStatus updates.
+     * \todo Make all the callbacks capable of taking class methods
+     */
+    void setStatusCallback(void (*status_callback)(SegwayStatus &segway_status));
+    
+    /*!
+     * Sets the Callback Function to be called on when debug messages occur.
+     * 
+     * This allows you to hook into the message reporting of the library and use
+     * your own logging facilities.
+     * 
+     * The provided function must follow this prototype:
+     * 
+     *    void yourDebugMsgCallback(const std::string &msg)
+     * 
+     * Here is an example:
+     * 
+     *    void yourDebugMsgCallback(const std::string &msg) {
+     *        std::cerr << "SegwayRMP Debug: " << msg << std::endl;
+     *    }
+     * 
+     * And the resulting call to make it the callback:
+     * 
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setDebugMsgCallback(yourDebugMsgCallback);
+     * 
+     * \param status_callback A function pointer to the callback to handle new 
+     * Debug Messages.
+     */
+    void setDebugMsgCallback(void (*f)(const std::string &msg));
+    
+    /*!
+     * Sets the Callback Function to be called on when info messages occur.
+     * 
+     * This allows you to hook into the message reporting of the library and use
+     * your own logging facilities.
+     * 
+     * The provided function must follow this prototype:
+     * 
+     *    void yourInfoMsgCallback(const std::string &msg)
+     * 
+     * Here is an example:
+     * 
+     *    void yourInfoMsgCallback(const std::string &msg) {
+     *        std::cout << "SegwayRMP Info: " << msg << std::endl;
+     *    }
+     * 
+     * And the resulting call to make it the callback:
+     * 
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setInfoMsgCallback(yourInfoMsgCallback);
+     * 
+     * \param status_callback A function pointer to the callback to handle new 
+     * Info Messages.
+     */
+    void setInfoMsgCallback(void (*f)(const std::string &msg));
+    
+    /*!
+     * Sets the Callback Function to be called on when error messages occur.
+     * 
+     * This allows you to hook into the message reporting of the library and use
+     * your own logging facilities.
+     * 
+     * The provided function must follow this prototype:
+     * 
+     *    void yourErrorMsgCallback(const std::string &msg)
+     * 
+     * Here is an example:
+     * 
+     *    void yourErrorMsgCallback(const std::string &msg) {
+     *        std::cerr << "SegwayRMP Error: " << msg << std::endl;
+     *    }
+     * 
+     * And the resulting call to make it the callback:
+     * 
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setErrorMsgCallback(yourErrorMsgCallback);
+     * 
+     * \param status_callback A function pointer to the callback to handle new 
+     * Error Messages.
+     * \todo Make all the callbacks capable of taking class methods
+     */
+    void setErrorMsgCallback(void (*f)(const std::string &msg));
 private:
     void readContinuously();
     void startContinuousRead();

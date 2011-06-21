@@ -43,19 +43,51 @@
 
 namespace segwayrmp {
 
+/*!
+ * Provides a serial based interface for reading and writing packets.
+ */
 class SerialRMPIO : public RMPIO {
 public:
+    /*!
+     * Constructs the SerialRMPIO object.
+     */
     SerialRMPIO();
     ~SerialRMPIO();
     
+    /*!
+     * Connects to the serial port if it has been configured. Can throw ConnectionFailedException.
+     */
     void connect();
     
+    /*!
+     * Disconnects from the serial port if it is open.
+     */
     void disconnect();
     
+    /*!
+     * Read Function, reads from the serial port.
+     * 
+     * \param buffer An unsigned char array for data to be read into.
+     * \param size The amount of data to be read.
+     * \return int Bytes read.
+     */
     int read(unsigned char* buffer, int size);
     
+    /*!
+     * Write Function, writes to the serial port.
+     * 
+     * \param buffer An unsigned char array of data to be written.
+     * \param size The amount of data to be written.
+     * \return int Bytes written.
+     */
     int write(unsigned char* buffer, int size);
     
+    /*!
+     * Configures the serial port.
+     * 
+     * \param port The com port identifier like '/dev/ttyUSB0' on POSIX and like 'COM1' on windows.
+     * \param baudrate The speed of the serial communication.
+     */
     void configure(std::string port, int baudrate);
     
 private:

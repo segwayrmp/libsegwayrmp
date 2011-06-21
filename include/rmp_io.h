@@ -46,32 +46,69 @@
 
 namespace segwayrmp {
 
+/*!
+ * Represents the structure of a usb packet to be sent or received over the wire.
+ */
 typedef struct {
-    unsigned short id;
-    unsigned char channel;
-    unsigned char data[8];
+    unsigned short id; /*!< Packet ID. */
+    unsigned char channel; /*!< CAN Bus Channel. */
+    unsigned char data[8]; /*!< Data bytes. */
 } Packet;
 
 static unsigned int BUFFER_SIZE = 36;
 
+/*!
+ * Provides a generic interface for getting, building, manipulating, and sending packets.
+ */
 class RMPIO {
 public:
-    // Must be implemented by child class
+    /*!
+     * Abstract Connect Function, implemented by subclass.
+     */
     virtual void connect() = 0;
     
-    // Must be implemented by child class
+    /*!
+     * Abstract Disconnect Function, implemented by subclass.
+     */
     virtual void disconnect() = 0;
     
-    // Must be implemented by child class
+    /*!
+     * Abstract Read Function, implemented by subclass.
+     * 
+     * \param buffer An unsigned char array for data to be read into.
+     * \param size The amount of data to be read.
+     * \return int Bytes read.
+     */
     virtual int read(unsigned char* buffer, int size) = 0;
     
-    // Must be implemented by child class
+    /*!
+     * Abstract Write Function, implemented by subclass.
+     * 
+     * \param buffer An unsigned char array of data to be written.
+     * \param size The amount of data to be written.
+     * \return int Bytes written.
+     */
     virtual int write(unsigned char* buffer, int size) = 0;
     
+    /*!
+     * This function reads from the RMP and returns one complete packet.
+     * 
+     * \param packet A packet by reference to be read into.
+     */
     void getPacket(Packet &packet);
     
+    /*!
+     * This function validates and writes a packet to the RMP.
+     * 
+     * \param packet A packet by reference to be written.
+     */
     void sendPacket(Packet &packet);
     
+    /*!
+     * A function to see if the underlying I/O interface is connected.
+     * 
+     * \return bool weather or not the underlying I/O interface is connected.
+     */
     bool isConnected() {return this->connected;}
     
 protected:
