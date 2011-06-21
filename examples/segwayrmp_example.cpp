@@ -8,31 +8,35 @@ void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
 }
 
 int run_segway(segwayrmp::InterfaceType interface_type, std::string configuration, int config_type = 0) {
-    segwayrmp::SegwayRMP rmp(interface_type);
-    if (interface_type == segwayrmp::serial) {
-        rmp.configureSerial(configuration);
-    } else if (interface_type == segwayrmp::usb) {
-        switch (config_type) {
-            case 1:
-                rmp.configureUSBBySerial(configuration);
-                break;
-            case 2:
-                rmp.configureUSBByDescription(configuration);
-                break;
-            case 3:
-                rmp.configureUSBByIndex(atoi(configuration.c_str()));
-                break;
-            case 0:
-            default:
-                std::cout << "Invalid interface type provided." << std::endl;
-                return 0;
+    try {
+        segwayrmp::SegwayRMP rmp(interface_type);
+        if (interface_type == segwayrmp::serial) {
+            rmp.configureSerial(configuration);
+        } else if (interface_type == segwayrmp::usb) {
+            switch (config_type) {
+                case 1:
+                    rmp.configureUSBBySerial(configuration);
+                    break;
+                case 2:
+                    rmp.configureUSBByDescription(configuration);
+                    break;
+                case 3:
+                    rmp.configureUSBByIndex(atoi(configuration.c_str()));
+                    break;
+                case 0:
+                default:
+                    std::cout << "Invalid interface type provided." << std::endl;
+                    return 0;
+            }
         }
-    }
-    rmp.setStatusCallback(handleSegwayStatus);
-    rmp.connect();
-    while(true) {
-        rmp.move(0.3, 0);
-        usleep(100000);
+        rmp.setStatusCallback(handleSegwayStatus);
+        rmp.connect();
+        while(true) {
+            rmp.move(0.3, 0);
+            usleep(100000);
+        }
+    } catch (std::exception &e) {
+        std::cout << "Error: " << e.what() << std::endl;
     }
 }
 
