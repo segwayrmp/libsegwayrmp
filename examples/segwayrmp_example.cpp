@@ -4,7 +4,7 @@
 #include "segwayrmp.h"
 
 void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
-    // std::cout << ss.str() << std::endl << std::endl;
+    std::cout << ss.str() << std::endl << std::endl;
 }
 
 int run_segway(segwayrmp::InterfaceType interface_type, std::string configuration, int config_type = 0) {
@@ -36,7 +36,7 @@ int run_segway(segwayrmp::InterfaceType interface_type, std::string configuratio
             usleep(100000);
         }
     } catch (std::exception &e) {
-        std::cout << "Error: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl;
     }
 }
 
