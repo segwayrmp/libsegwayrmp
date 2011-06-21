@@ -12,6 +12,8 @@ namespace {
 class PacketTests : public ::testing::Test {
 protected:
     virtual void SetUp() {
+        segway_rmp = new SegwayRMP(no_interface);
+        
         pck.channel = 0xAA;
         pck.id = 0x0400;
         pck.data[0] = 0x00;
@@ -24,7 +26,7 @@ protected:
         pck.data[7] = 0x00;
     }
     
-    SegwayRMP segway_rmp;
+    SegwayRMP *segway_rmp;
     Packet pck;
     SegwayStatus ss;
 };
@@ -32,13 +34,13 @@ protected:
 TEST_F(PacketTests, IgnoresChannelB) {
     pck.channel = 0xBB;
     pck.id = 0x0401;
-    segway_rmp._parsePacket(pck, ss);
+    segway_rmp->_parsePacket(pck, ss);
     
     ASSERT_FALSE(ss.touched);
 }
 
 TEST_F(PacketTests, IgnoresCommandRequest) {
-    segway_rmp._parsePacket(pck,ss);
+    segway_rmp->_parsePacket(pck,ss);
     
     ASSERT_FALSE(ss.touched);
 }
@@ -54,7 +56,7 @@ TEST_F(PacketTests, ParsesPitchRollCorrectly) {
     pck.data[6] = 0x00;
     pck.data[7] = 0x09;
     
-    segway_rmp._parsePacket(pck,ss);
+    segway_rmp->_parsePacket(pck,ss);
     EXPECT_TRUE(ss.touched);
     EXPECT_NEAR(-0.897,ss.pitch,0.128);
     EXPECT_NEAR(1.923,ss.pitch_rate,0.128);
@@ -73,7 +75,7 @@ TEST_F(PacketTests, ParsesWheelSpeedsYawRatesServoFramesCorrectly) {
     pck.data[6] = 0x18;
     pck.data[7] = 0xD4;
     
-    segway_rmp._parsePacket(pck,ss);
+    segway_rmp->_parsePacket(pck,ss);
     EXPECT_TRUE(ss.touched);
     EXPECT_NEAR(0.0361,ss.left_wheel_speed,0.003);
     EXPECT_NEAR(-0.0422,ss.right_wheel_speed,0.003);
@@ -92,7 +94,7 @@ TEST_F(PacketTests, ParsesIntegratedWheelsCorrectly) {
     pck.data[6] = 0x00;
     pck.data[7] = 0x00;
     
-    segway_rmp._parsePacket(pck,ss);
+    segway_rmp->_parsePacket(pck,ss);
     EXPECT_TRUE(ss.touched);
     EXPECT_NEAR(-0.0152341,ss.integrated_left_wheel_position,0.00003);
     EXPECT_NEAR(0.0023784,ss.integrated_right_wheel_position,0.00003);
@@ -110,7 +112,7 @@ TEST_F(PacketTests, ParsesIntegratedDistanceTurnCorrectly) {
     pck.data[6] = 0xFF;
     pck.data[7] = 0xFF;
     
-    segway_rmp._parsePacket(pck,ss);
+    segway_rmp->_parsePacket(pck,ss);
     EXPECT_TRUE(ss.touched);
     EXPECT_NEAR(-0.0300768,ss.integrated_forward_position,0.00003);
     EXPECT_NEAR(-0.0007457,ss.integrated_turn_position,0.00001);
@@ -129,7 +131,7 @@ TEST_F(PacketTests, ParsesMotorTorqueCorrectly) {
     pck.data[6] = 0x00;
     pck.data[7] = 0x00;
     
-    segway_rmp._parsePacket(pck,ss);
+    segway_rmp->_parsePacket(pck,ss);
     EXPECT_TRUE(ss.touched);
     EXPECT_NEAR(-0.006399,ss.left_motor_torque,0.0009);
     EXPECT_NEAR(0.152651,ss.right_motor_torque,0.0009);
@@ -147,7 +149,7 @@ TEST_F(PacketTests, ParsesStatusesCorrectly) {
     pck.data[6] = 0x01;
     pck.data[7] = 0x38;
     
-    segway_rmp._parsePacket(pck,ss);
+    segway_rmp->_parsePacket(pck,ss);
     EXPECT_TRUE(ss.touched);
     // EXPECT_EQ(1,(int)ss.operational_mode);
     // EXPECT_EQ(0,(int)ss.controller_gain_schedule);

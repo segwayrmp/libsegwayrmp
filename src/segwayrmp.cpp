@@ -77,6 +77,8 @@ SegwayRMP::SegwayRMP(InterfaceType interface_type) {
         #else
         throw(ConfigurationException("InterfaceType", "The segwayrmp library is not built with ftd2xx usb support, but usb was specified."));
         #endif
+    } else if (this->interface_type == no_interface) {
+        ;
     } else {
         throw(ConfigurationException("InterfaceType", "The specified interface type is not supported or invalid."));
     }
