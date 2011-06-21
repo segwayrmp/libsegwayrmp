@@ -41,7 +41,8 @@
 #define SEGWAYRMP_H
 
 #include <sstream>
-
+#include <iostream>
+#include <stdio.h>
 #include <math.h>
 
 #include "rmp_io.h"
