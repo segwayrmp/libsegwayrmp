@@ -364,15 +364,15 @@ void SegwayRMP::setStatusCallback(void (*status_callback)(SegwayStatus &segway_s
     this->status_callback = status_callback;
 }
 
-void SegwayRMP::setDebugMsgCallback(void (*f)(const std::string &msg)) {
+void SegwayRMP::setDebugMsgCallback(void (*debug_callback)(const std::string &msg)) {
     this->debug = f;
 }
 
-void SegwayRMP::setInfoMsgCallback(void (*f)(const std::string &msg)) {
+void SegwayRMP::setInfoMsgCallback(void (*info_callback)(const std::string &msg)) {
     this->info = f;
 }
 
-void SegwayRMP::setErrorMsgCallback(void (*f)(const std::string &msg)) {
+void SegwayRMP::setErrorMsgCallback(void (*error_callback)(const std::string &msg)) {
     this->error = f;
 }
 

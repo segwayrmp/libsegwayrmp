@@ -108,7 +108,7 @@ public:
     /*!
      * Configures the usb port using the devices index.
      * 
-     * \param index The index of the FTDI, something like 0. 
+     * \param device_index The index of the FTDI, something like 0. 
      * This is its index amoung all FTD2XX devices on the system.
      * \param baudrate The speed of the usb communication.
      */

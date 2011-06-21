@@ -295,10 +295,10 @@ public:
      *    segwayrmp::SegwayRMP my_segway_rmp;
      *    my_segway_rmp.setDebugMsgCallback(yourDebugMsgCallback);
      * 
-     * \param status_callback A function pointer to the callback to handle new 
+     * \param debug_callback A function pointer to the callback to handle new 
      * Debug Messages.
      */
-    void setDebugMsgCallback(void (*f)(const std::string &msg));
+    void setDebugMsgCallback(void (*debug_callback)(const std::string &msg));
     
     /*!
      * Sets the Callback Function to be called on when info messages occur.
@@ -321,10 +321,10 @@ public:
      *    segwayrmp::SegwayRMP my_segway_rmp;
      *    my_segway_rmp.setInfoMsgCallback(yourInfoMsgCallback);
      * 
-     * \param status_callback A function pointer to the callback to handle new 
+     * \param info_callback A function pointer to the callback to handle new 
      * Info Messages.
      */
-    void setInfoMsgCallback(void (*f)(const std::string &msg));
+    void setInfoMsgCallback(void (*info_callback)(const std::string &msg));
     
     /*!
      * Sets the Callback Function to be called on when error messages occur.
@@ -347,11 +347,11 @@ public:
      *    segwayrmp::SegwayRMP my_segway_rmp;
      *    my_segway_rmp.setErrorMsgCallback(yourErrorMsgCallback);
      * 
-     * \param status_callback A function pointer to the callback to handle new 
+     * \param error_callback A function pointer to the callback to handle new 
      * Error Messages.
      * \todo Make all the callbacks capable of taking class methods
      */
-    void setErrorMsgCallback(void (*f)(const std::string &msg));
+    void setErrorMsgCallback(void (*error_callback)(const std::string &msg));
 private:
     void readContinuously();
     void startContinuousRead();
