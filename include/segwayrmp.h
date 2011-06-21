@@ -84,7 +84,7 @@ static double RPS_TO_COUNTS = (180.0/M_PI)*(7.8);
  */
 typedef enum {
     can     = 0, /*!< This method is unsupported currently. */
-    usb     = 1, /*!< This method is unsupported currently. */
+    usb     = 1, /*!< This method communicates to the Segway via usb using the FTD2XX library. */
     serial  = 2, /*!< This method communicates to the Segway via a virtual serial port. */
     no_interface = -1
 } InterfaceType;

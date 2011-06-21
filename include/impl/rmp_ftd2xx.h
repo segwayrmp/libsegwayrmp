@@ -1,9 +1,9 @@
-/**
- * @file rmp_ftd2xx.h
- * @author  William Woodall <wjwwood@gmail.com>
- * @version 0.1
+/*!
+ * \file rmp_ftd2xx.h
+ * \author  William Woodall <wjwwood@gmail.com>
+ * \version 0.1
  *
- * @section LICENSE
+ * \section LICENSE
  *
  * The BSD License
  *
@@ -27,7 +27,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @section DESCRIPTION
+ * \section DESCRIPTION
  *
  * This provides a FTD2XX based usb implementation of the rmp_io interface.
  * 
