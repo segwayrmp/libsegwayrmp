@@ -4,6 +4,13 @@
 
 http://docs.williamjwoodall.com/libsegwayrmp/
 
+## Dependencies
+
+* CMake, for the build system: http://www.cmake.org/
+* Boost, for threading: http://www.boost.org/
+* FTDI D2XX (optional), for ftd2xx based usb support: http://www.ftdichip.com/Drivers/D2XX.htm
+* Serial (optional), for serial based communication: https://github.com/wjwwood/serial
+
 ## Installation
 
 Get the source:
