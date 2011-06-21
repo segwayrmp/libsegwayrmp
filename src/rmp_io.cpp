@@ -24,12 +24,12 @@ void RMPIO::getPacket(Packet &packet) {
     while(!packet_complete) {
         // Top the buffer off
         size_t prev_size = this->data_buffer.size();
-        if(prev_size < 18)
+        if(prev_size < 18) {
             this->fillBuffer();
-        
-        // Ensure that data was read into the buffer
-        if(prev_size == this->data_buffer.size()) {
-            throw(PacketRetrievalException(3, "No data received from Segway."));
+            // Ensure that data was read into the buffer
+            if(prev_size == this->data_buffer.size()) {
+                throw(PacketRetrievalException(3, "No data received from Segway."));
+            }
         }
         
         // If looking for start of packet and start of packet
@@ -113,6 +113,7 @@ void RMPIO::sendPacket(Packet &packet) {
     }
     // Compute and set the checksum
     usb_packet[17] = this->computeChecksum(usb_packet);
+    
     // Write the data
     this->write(usb_packet, 18);
 }

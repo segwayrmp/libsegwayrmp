@@ -52,7 +52,7 @@ void FTD2XXRMPIO::connect() {
     
     // Configure the Baudrate
     try {
-        result = FT_SetBaudRate(&(this->usb_port_handle), this->baudrate);
+        result = FT_SetBaudRate(this->usb_port_handle, this->baudrate);
     } catch(std::exception &e) {
         throw(ConnectionFailedException(e.what()));
     }
@@ -61,18 +61,18 @@ void FTD2XXRMPIO::connect() {
     }
     
     // Configure Data Characteristics
-    try {
-        result = FT_SetDataCharacteristics(&(this->usb_port_handle), FT_BITS_8, FT_STOP_BITS_1, FT_PARITY_NONE);
-    } catch(std::exception &e) {
-        throw(ConnectionFailedException(e.what()));
-    }
-    if (result != FT_OK) {
-        throw(ConnectionFailedException(this->getErrorMessageByFT_STATUS(result, "setting data characteristics").c_str()));
-    }
+    // try {
+    //     result = FT_SetDataCharacteristics(this->usb_port_handle, FT_BITS_8, FT_STOP_BITS_1, FT_PARITY_NONE);
+    // } catch(std::exception &e) {
+    //     throw(ConnectionFailedException(e.what()));
+    // }
+    // if (result != FT_OK) {
+    //     throw(ConnectionFailedException(this->getErrorMessageByFT_STATUS(result, "setting data characteristics").c_str()));
+    // }
     
     // Set default timeouts
     try {
-        result = FT_SetTimeouts(&(this->usb_port_handle), 1000, 1000); // 1 sec read and 1 sec write
+        result = FT_SetTimeouts(this->usb_port_handle, 1000, 1000); // 1 sec read and 1 sec write
     } catch(std::exception &e) {
         throw(ConnectionFailedException(e.what()));
     }
@@ -80,9 +80,19 @@ void FTD2XXRMPIO::connect() {
         throw(ConnectionFailedException(this->getErrorMessageByFT_STATUS(result, "setting timeouts").c_str()));
     }
     
+    // Set Latency Timer
+    try {
+        result = FT_SetLatencyTimer(this->usb_port_handle, 1);
+    } catch(std::exception &e) {
+        throw(ConnectionFailedException(e.what()));
+    }
+    if (result != FT_OK) {
+        throw(ConnectionFailedException(this->getErrorMessageByFT_STATUS(result, "setting latency timer").c_str()));
+    }
+    
     // Set flowcontrol
     try {
-        result = FT_SetFlowControl(&(this->usb_port_handle), FT_FLOW_NONE, 0, 0);
+        result = FT_SetFlowControl(this->usb_port_handle, FT_FLOW_NONE, 0, 0);
     } catch(std::exception &e) {
         throw(ConnectionFailedException(e.what()));
     }
@@ -92,7 +102,7 @@ void FTD2XXRMPIO::connect() {
     
     // Purge the I/O buffers of the usb device
     try {
-        result = FT_Purge(&(this->usb_port_handle), FT_PURGE_RX | FT_PURGE_TX);
+        result = FT_Purge(this->usb_port_handle, FT_PURGE_RX | FT_PURGE_TX);
     } catch(std::exception &e) {
         throw(ConnectionFailedException(e.what()));
     }
@@ -106,7 +116,7 @@ void FTD2XXRMPIO::connect() {
 void FTD2XXRMPIO::disconnect() {
     if(this->connected) {
         if (this->is_open) {
-            FT_Close(&(this->usb_port_handle));
+            FT_Close(this->usb_port_handle);
         }
         this->connected = false;
     }
@@ -117,7 +127,7 @@ int FTD2XXRMPIO::read(unsigned char* buffer, int size) {
     DWORD bytes_read;
     
     try {
-        result = FT_Read(&(this->usb_port_handle), buffer, size, &bytes_read);
+        result = FT_Read(this->usb_port_handle, buffer, size, &bytes_read);
     } catch(std::exception &e) {
         throw(ReadFailedException(e.what()));
     }
@@ -133,7 +143,7 @@ int FTD2XXRMPIO::write(unsigned char* buffer, int size) {
     DWORD bytes_written;
     
     try {
-        result = FT_Write(&(this->usb_port_handle), buffer, size, &bytes_written);
+        result = FT_Write(this->usb_port_handle, buffer, size, &bytes_written);
     } catch(std::exception &e) {
         throw(ReadFailedException(e.what()));
     }
@@ -151,7 +161,7 @@ void FTD2XXRMPIO::enumerateUSBDevices() {
     
     // If mac or linux you must set VID/PID
     #ifndef _WIN32
-    DWORD FTDI_VID = 0x0403;
+    DWORD FTDI_VID = 0x403;
     DWORD SEGWAY_PID = 0xe729;
     
     try {
@@ -213,28 +223,14 @@ void FTD2XXRMPIO::connectBySerial() {
     DWORD number_of_devices;
     
     try {
-        result = FT_ListDevices(&number_of_devices, NULL, FT_LIST_NUMBER_ONLY);
-    } catch(std::exception &e) {
-        throw(ConnectionFailedException(e.what()));
-    }
-    if (result != FT_OK) {
-        // Failed to open port
-        throw(ConnectionFailedException(this->getErrorMessageByFT_STATUS(result, "opening the usb port").c_str()));
-    }
-    
-    if (number_of_devices <= 0) {
-        throw(ConnectionFailedException("No devices connected."));
-    }
-    
-    try {
-        // Configure and open the usb port
-        result = FT_OpenEx((PVOID)this->port_serial_number.c_str(), 
-                           (DWORD)FT_OPEN_BY_SERIAL_NUMBER, 
+        // Open the usb port
+        result = FT_OpenEx((PVOID)this->port_serial_number.c_str(),
+                           (DWORD)FT_OPEN_BY_SERIAL_NUMBER,
                            &(this->usb_port_handle));
     } catch(std::exception &e) {
         throw(ConnectionFailedException(e.what()));
     }
-    if (result != FT_OK) {
+    if (this->usb_port_handle == NULL) {
         // Failed to open port
         throw(ConnectionFailedException(this->getErrorMessageByFT_STATUS(result, "opening the usb port").c_str()));
     }
@@ -251,7 +247,7 @@ void FTD2XXRMPIO::connectByDescription() {
     FT_STATUS result;
     
     try {
-        // Configure and open the usb port
+        // Open the usb port
         result = FT_OpenEx(const_cast<char *>(this->port_description.c_str()), 
                            FT_OPEN_BY_DESCRIPTION, 
                            &(this->usb_port_handle));
@@ -275,12 +271,12 @@ void FTD2XXRMPIO::connectByIndex() {
     FT_STATUS result;
     
     try {
-        // Configure and open the usb port
+        // Open the usb port
         result = FT_Open(this->port_index, &(this->usb_port_handle));
     } catch(std::exception &e) {
         throw(ConnectionFailedException(e.what()));
     }
-    if (result != FT_OK) {
+    if (this->usb_port_handle == NULL) {
         // Failed to open port
         throw(ConnectionFailedException(this->getErrorMessageByFT_STATUS(result, "opening the usb port").c_str()));
     }

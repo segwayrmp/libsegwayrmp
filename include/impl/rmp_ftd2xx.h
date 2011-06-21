@@ -48,7 +48,7 @@ namespace segwayrmp {
  */
 typedef enum {
     by_serial_number   = 0, /*!< This method requires a serial number like "FT000001". */
-    by_description     = 1, /*!< This method requires a description like "Robotic Mobility Platform". */
+    by_description     = 1, /*!< This method requires a description like "Robotic Mobile Platform". */
     by_index           = 2, /*!< This method requires an index like 0 or 1.  This selects amoung all FTD2XX devices. */
     by_none            = 3  /*!< Means it hasn't been set yet. */
 } ConfigurationType;
