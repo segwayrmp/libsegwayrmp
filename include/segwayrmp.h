@@ -204,8 +204,8 @@ public:
     /*!
      * This command moves the base.
      * 
-     * \param linear Forward/Reverse desired velocity of the vehicle in m/s.
-     * \param angular Desired angular velocity of the vehicle in rad/s, positive to is left.
+     * \param linear_velocity Forward/Reverse desired velocity of the vehicle in m/s.
+     * \param angular_velocity Desired angular velocity of the vehicle in rad/s, positive to is left.
      */
     void move(float linear_velocity, float angular_velocity);
     
