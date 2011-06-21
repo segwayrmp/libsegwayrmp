@@ -172,32 +172,34 @@ ENDIF(NOT CMAKE_INSTALL_PREFIX)
 ## Install setup
 
 # Install the library
-INSTALL(
-        TARGETS segwayrmp
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-)
-
-INSTALL(FILES ${SEGWAYRMP_HEADERS} DESTINATION include)
-
-IF(NOT CMAKE_FIND_INSTALL_PATH)
-    set(CMAKE_FIND_INSTALL_PATH ${CMAKE_ROOT})
-ENDIF(NOT CMAKE_FIND_INSTALL_PATH)
-
-INSTALL(FILES Findsegwayrmp.cmake DESTINATION ${CMAKE_FIND_INSTALL_PATH}/Modules/)
-
-ADD_CUSTOM_TARGET (uninstall @echo uninstall package)
-
-IF(UNIX)
-  ADD_CUSTOM_COMMAND(
-                     COMMENT "uninstall package"
-                     COMMAND xargs ARGS rm < install_manifest.txt
-                     TARGET  uninstall
-  )
-ELSE(UNIX)
-  ADD_CUSTOM_COMMAND(
-                     COMMENT "uninstall only implemented in unix"
-                     TARGET  uninstall
-  )
-ENDIF(UNIX)
+IF(NOT SEGWAYRMP_DONT_SETUP_INSTALL)
+    INSTALL(
+            TARGETS segwayrmp
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib
+    )
+    
+    INSTALL(FILES ${SEGWAYRMP_HEADERS} DESTINATION include)
+    
+    IF(NOT CMAKE_FIND_INSTALL_PATH)
+        set(CMAKE_FIND_INSTALL_PATH ${CMAKE_ROOT})
+    ENDIF(NOT CMAKE_FIND_INSTALL_PATH)
+    
+    INSTALL(FILES Findsegwayrmp.cmake DESTINATION ${CMAKE_FIND_INSTALL_PATH}/Modules/)
+    
+    ADD_CUSTOM_TARGET(uninstall @echo uninstall package)
+    
+    IF(UNIX)
+      ADD_CUSTOM_COMMAND(
+                         COMMENT "uninstall package"
+                         COMMAND xargs ARGS rm < install_manifest.txt
+                         TARGET  uninstall
+      )
+    ELSE(UNIX)
+      ADD_CUSTOM_COMMAND(
+                         COMMENT "uninstall only implemented in unix"
+                         TARGET  uninstall
+      )
+    ENDIF(UNIX)
+ENDIF(NOT SEGWAYRMP_DONT_SETUP_INSTALL)
