@@ -251,6 +251,16 @@ public:
     void setMaxVelocityScaleFactor(double scalar = 1.0);
     
     /*!
+     * Sets the Max Acceleration Scale Factor
+     *
+     * \param scalar This is a value between 0.0 and 1.0 which will set the
+     * acceleration scale factor on the segway internally for all velocity commands.
+     * Values larger than 1.0 will round down to 1.0 and values < 0 will round
+     * up to 0.0. Parameter defaults to 1.0.
+     */
+    void setMaxAccelerationScaleFactor(double scalar = 1.0);
+    
+    /*!
      * Sets the Callback Function to be called on new Segway Status Updates.
      * 
      * The provided function must follow this prototype:
