@@ -226,9 +226,9 @@ void SegwayRMP::setOperationalMode(OperationalMode operational_mode) {
         
         this->rmp_io->sendPacket(packet);
         
-        while(this->segway_status.operational_mode != operational_mode) {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(10)); // Check again in 10 ms
-        }
+        // while(this->segway_status.operational_mode != operational_mode) {
+        //     boost::this_thread::sleep(boost::posix_time::milliseconds(10)); // Check again in 10 ms
+        // }
     } catch(std::exception &e) {
         throw(ConfigurationException("Operational Mode", e.what()));
     }
@@ -391,6 +391,74 @@ void SegwayRMP::setMaxAccelerationScaleFactor(double scalar) {
         this->rmp_io->sendPacket(packet);
     } catch(std::exception &e) {
         throw(ConfigurationException("Max Acceleration Scale Factor", e.what()));
+    }
+}
+
+void SegwayRMP::setMaxTurnScaleFactor(double scalar) {
+    // Ensure we are connected
+    if(!this->connected)
+        throw(ConfigurationException("Max Turn Scale Factor", "Not Connected."));
+    try {
+        Packet packet;
+        
+        packet.id = 0x0413;
+        
+        packet.data[0] = 0x00;
+        packet.data[1] = 0x00;
+        packet.data[2] = 0x00;
+        packet.data[3] = 0x00;
+        packet.data[4] = 0x00;
+        packet.data[5] = 0x0C;
+        packet.data[6] = 0x00;
+        
+        if (scalar < 0.0)
+            scalar = 0.0;
+        if (scalar > 1.0)
+            scalar = 1.0;
+        scalar *= 16.0;
+        scalar = floor(scalar);
+        
+        short int scalar_int = (short int)scalar;
+        
+        packet.data[7] = (unsigned char)(scalar_int & 0x00FF);
+        
+        this->rmp_io->sendPacket(packet);
+    } catch(std::exception &e) {
+        throw(ConfigurationException("Max Turn Scale Factor", e.what()));
+    }
+}
+
+void SegwayRMP::setCurrentLimitScaleFactor(double scalar) {
+    // Ensure we are connected
+    if(!this->connected)
+        throw(ConfigurationException("Current Limit Scale Factor", "Not Connected."));
+    try {
+        Packet packet;
+        
+        packet.id = 0x0413;
+        
+        packet.data[0] = 0x00;
+        packet.data[1] = 0x00;
+        packet.data[2] = 0x00;
+        packet.data[3] = 0x00;
+        packet.data[4] = 0x00;
+        packet.data[5] = 0x0E;
+        packet.data[6] = 0x00;
+        
+        if (scalar < 0.0)
+            scalar = 0.0;
+        if (scalar > 1.0)
+            scalar = 1.0;
+        scalar *= 256.0;
+        scalar = floor(scalar);
+        
+        short int scalar_int = (short int)scalar;
+        
+        packet.data[7] = (unsigned char)(scalar_int & 0x00FF);
+        
+        this->rmp_io->sendPacket(packet);
+    } catch(std::exception &e) {
+        throw(ConfigurationException("Current Limit Scale Factor", e.what()));
     }
 }
 
