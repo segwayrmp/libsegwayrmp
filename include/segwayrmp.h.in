@@ -47,11 +47,14 @@
 
 #include "rmp_io.h"
 
-#ifdef SEGWAYRMP_SERIAL_SUPPORT
+#cmakedefine01 SEGWAYRMP_SERIAL_SUPPORT
+#cmakedefine01 SEGWAYRMP_FTD2XX_SUPPORT
+
+#if SEGWAYRMP_SERIAL_SUPPORT
 #include "rmp_serial.h"
 #endif
 
-#ifdef SEGWAYRMP_FTD2XX_SUPPORT
+#if SEGWAYRMP_FTD2XX_SUPPORT
 #include "rmp_ftd2xx.h"
 #endif
 

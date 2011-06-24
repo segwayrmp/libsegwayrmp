@@ -7,7 +7,7 @@ project(segwayrmp)
 
 option(SEGWAYRMP_BUILD_TESTS "Build all of the SegwayRMP tests." OFF)
 option(SEGWAYRMP_BUILD_EXAMPLES "Build all of the SegwayRMP examples." OFF)
-option(SEGWAYRMP_USE_SERIAL "Build the library with serial support, requires http://github.com/wjwwood/serial/ ." ON)
+option(SEGWAYRMP_USE_SERIAL "Build the library with serial support, requires http://github.com/wjwwood/serial/" ON)
 option(SEGWAYRMP_USE_FTD2XX "Build the library with FTD2XX support, requires http://www.ftdichip.com/Drivers/D2XX.htm" ON)
 
 # Check to make sure at least one implementation is on
@@ -81,6 +81,10 @@ IF(serial_FOUND)
     list(APPEND SEGWAYRMP_SRCS src/impl/rmp_serial.cpp)
     
     list(APPEND SEGWAYRMP_HEADERS include/impl/rmp_serial.h)
+    
+    set(SEGWAYRMP_SERIAL_SUPPORT TRUE)
+ELSE(FTD2XX_FOUND)
+    set(SEGWAYRMP_SERIAL_SUPPORT FALSE)
 ENDIF(serial_FOUND)
 
 ## FTD2XX implementation setup
@@ -96,11 +100,11 @@ IF(SEGWAYRMP_USE_FTD2XX)
     IF(NOT FTD2XX_INCLUDE_DIR)
         set(FTD2XX_FOUND FALSE)
     ENDIF(NOT FTD2XX_INCLUDE_DIR)
-
+    
     IF(NOT FTD2XX_LIBRARIES)
         set(FTD2XX_FOUND FALSE)
     ENDIF(NOT FTD2XX_LIBRARIES)
-
+    
     IF(NOT FTD2XX_FOUND)
         message("libsegwayrmp: FTD2XX library not found, FTD2XX usb support will not be built.")
     ELSE(NOT FTD2XX_FOUND)
@@ -115,8 +119,16 @@ IF(FTD2XX_FOUND)
     
     list(APPEND SEGWAYRMP_SRCS src/impl/rmp_ftd2xx.cpp)
     
-    list(APPEND SEGWAYRMP_HEADERS include/impl/rmp_ftd2xx.h)
+    list(APPEND SEGWAYRMP_HEADERS_ORIG include/impl/rmp_ftd2xx.h)
+    
+    set(SEGWAYRMP_FTD2XX_SUPPORT TRUE)
+ELSE(FTD2XX_FOUND)
+    set(SEGWAYRMP_FTD2XX_SUPPORT FALSE)
 ENDIF(FTD2XX_FOUND)
+
+## Perform header configuration
+
+configure_file(${PROJECT_SOURCE_DIR}/include/segwayrmp.h.in ${PROJECT_SOURCE_DIR}/include/segwayrmp.h)
 
 ## Build the library
 

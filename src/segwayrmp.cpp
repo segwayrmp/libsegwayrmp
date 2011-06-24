@@ -66,13 +66,13 @@ std::string SegwayStatus::str() {
 SegwayRMP::SegwayRMP(InterfaceType interface_type) {
     this->interface_type = interface_type;
     if (this->interface_type == serial) {
-        #ifdef SEGWAYRMP_SERIAL_SUPPORT
+        #if SEGWAYRMP_SERIAL_SUPPORT
         this->rmp_io = new SerialRMPIO();
         #else
         throw(ConfigurationException("InterfaceType", "The segwayrmp library is not built with serial support, but serial was specified."));
         #endif
     } else if (this->interface_type == usb) {
-        #ifdef SEGWAYRMP_FTD2XX_SUPPORT
+        #if SEGWAYRMP_FTD2XX_SUPPORT
         this->rmp_io = new FTD2XXRMPIO();
         #else
         throw(ConfigurationException("InterfaceType", "The segwayrmp library is not built with ftd2xx usb support, but usb was specified."));
@@ -97,7 +97,7 @@ SegwayRMP::~SegwayRMP() {
 }
 
 void SegwayRMP::configureSerial(std::string port, int baudrate) {
-    #ifdef SEGWAYRMP_SERIAL_SUPPORT
+    #if SEGWAYRMP_SERIAL_SUPPORT
     if(this->interface_type == serial) {
         SerialRMPIO * serial_rmp = (SerialRMPIO*)(this->rmp_io);
         serial_rmp->configure(port, baudrate);
@@ -111,7 +111,7 @@ void SegwayRMP::configureSerial(std::string port, int baudrate) {
 }
 
 void SegwayRMP::configureUSBBySerial(std::string serial_number, int baudrate) {
-    #ifdef SEGWAYRMP_FTD2XX_SUPPORT
+    #if SEGWAYRMP_FTD2XX_SUPPORT
     if(this->interface_type == usb) {
         FTD2XXRMPIO * ftd2xx_rmp = (FTD2XXRMPIO*)(this->rmp_io);
         ftd2xx_rmp->configureUSBBySerial(serial_number, baudrate);
@@ -125,7 +125,7 @@ void SegwayRMP::configureUSBBySerial(std::string serial_number, int baudrate) {
 }
 
 void SegwayRMP::configureUSBByDescription(std::string description, int baudrate) {
-    #ifdef SEGWAYRMP_FTD2XX_SUPPORT
+    #if SEGWAYRMP_FTD2XX_SUPPORT
     if(this->interface_type == usb) {
         FTD2XXRMPIO * ftd2xx_rmp = (FTD2XXRMPIO*)(this->rmp_io);
         ftd2xx_rmp->configureUSBByDescription(description, baudrate);
@@ -139,7 +139,7 @@ void SegwayRMP::configureUSBByDescription(std::string description, int baudrate)
 }
 
 void SegwayRMP::configureUSBByIndex(int device_index, int baudrate) {
-    #ifdef SEGWAYRMP_FTD2XX_SUPPORT
+    #if SEGWAYRMP_FTD2XX_SUPPORT
     if(this->interface_type == usb) {
         FTD2XXRMPIO * ftd2xx_rmp = (FTD2XXRMPIO*)(this->rmp_io);
         ftd2xx_rmp->configureUSBByIndex(device_index, baudrate);
