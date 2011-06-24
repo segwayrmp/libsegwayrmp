@@ -37,7 +37,7 @@
 #ifndef RMP_FTD2XX_H
 #define RMP_FTD2XX_H
 
-#include "../rmp_io.h"
+#include "rmp_io.h"
 
 #include "ftd2xx.h"
 

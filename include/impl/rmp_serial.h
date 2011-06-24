@@ -37,7 +37,7 @@
 #ifndef RMP_SERIAL_H
 #define RMP_SERIAL_H
 
-#include "../rmp_io.h"
+#include "rmp_io.h"
 
 #include "serial.h"
 
