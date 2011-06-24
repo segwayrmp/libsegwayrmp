@@ -188,7 +188,7 @@ void SegwayRMP::move(float linear_velocity, float angular_velocity) {
         throw(MoveFailedException("Not Connected."));
     try {
         short int lv = (short int)(linear_velocity*this->mps_to_counts);
-        short int av = (short int)(angular_velocity*1024.0);
+        short int av = (short int)(angular_velocity*this->rps_to_counts);
         
         Packet packet;
         
