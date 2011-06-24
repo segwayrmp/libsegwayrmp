@@ -1,5 +1,6 @@
 #include <iostream>
-#include <string.h>
+#include <string>
+#include <algorithm>
 
 #include "segwayrmp.h"
 
@@ -8,7 +9,20 @@ void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
 }
 
 int run_segway(segwayrmp::InterfaceType interface_type, std::string configuration, int config_type = 0) {
+    std::cout << "!!!!!!!!!!!!WARNING!!!!!!!!!!!!" << std::endl;
+    std::cout << "This example moves the segway!!" << std::endl;
+    std::cout << "(If you continue, ctrl-c quits)" << std::endl;
+    std::cout << "Do you want to continue? [No/yes]  ";
+    std::string response;
+    std::getline(std::cin, response);
+    std::transform(response.begin(), response.end(),
+    response.begin(), ::tolower);
+    if (response != std::string("yes") and response != std::string("y")) {
+        std::cout << "Aborting." << std::endl;
+        return 1;
+    }
     try {
+        // segwayrmp::SegwayRMP rmp(interface_type, segwayrmp::rmp100);
         segwayrmp::SegwayRMP rmp(interface_type);
         if (interface_type == segwayrmp::serial) {
             rmp.configureSerial(configuration);
@@ -32,7 +46,7 @@ int run_segway(segwayrmp::InterfaceType interface_type, std::string configuratio
         rmp.setStatusCallback(handleSegwayStatus);
         rmp.connect();
         while(true) {
-            rmp.move(0.3, 0);
+            rmp.move(0.1, 0);
             usleep(100000);
         }
     } catch (std::exception &e) {
@@ -41,10 +55,12 @@ int run_segway(segwayrmp::InterfaceType interface_type, std::string configuratio
 }
 
 void print_usage() {
-    std::cout << "Usage: segwayrmp_example usb <serial_number | description | index> <\"00000056\" | \"Robotic Mobile Platform\" | 0>" << std::endl;
+    std::cout << "Usage: " << std::endl;
+    std::cout << "       segwayrmp_example usb <serial_number | description | index> <\"00000056\" | \"Robotic Mobile Platform\" | 0>" << std::endl;
     std::cout << "       or" << std::endl;
     std::cout << "       segwayrmp_example serial <serial port>" << std::endl;
     std::cout << "Examples:" << std::endl;
+    std::cout << "       segwayrmp_example usb index 0" << std::endl;
     std::cout << "       segwayrmp_example usb serial_number \"00000056\"" << std::endl;
     std::cout << "       segwayrmp_example serial /dev/ttyUSB0" << std::endl;
     std::cout << "       segwayrmp_example serial COM0" << std::endl;

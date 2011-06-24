@@ -63,8 +63,9 @@ std::string SegwayStatus::str() {
     return ss.str();
 }
 
-SegwayRMP::SegwayRMP(InterfaceType interface_type) {
+SegwayRMP::SegwayRMP(InterfaceType interface_type, SegwayRMPType segway_rmp_type) {
     this->interface_type = interface_type;
+    this->segway_type = segway_rmp_type;
     if (this->interface_type == serial) {
         #if SEGWAYRMP_SERIAL_SUPPORT
         this->rmp_io = new SerialRMPIO();
@@ -88,7 +89,8 @@ SegwayRMP::SegwayRMP(InterfaceType interface_type) {
     this->debug = defaultDebugMsgCallback;
     this->info = defaultInfoMsgCallback;
     this->error = defaultErrorMsgCallback;
-    this->count = 0;
+    
+    this->configureSegwayType();
 }
 
 SegwayRMP::~SegwayRMP() {
@@ -185,7 +187,7 @@ void SegwayRMP::move(float linear_velocity, float angular_velocity) {
     if(!this->connected)
         throw(MoveFailedException("Not Connected."));
     try {
-        short int lv = (short int)(linear_velocity*MPS_TO_COUNTS);
+        short int lv = (short int)(linear_velocity*this->mps_to_counts);
         short int av = (short int)(angular_velocity*1024.0);
         
         Packet packet;
@@ -506,6 +508,24 @@ void SegwayRMP::stopContinuousRead() {
     this->continuous_read_thread.join();
 }
 
+void SegwayRMP::configureSegwayType() {
+    if (this->segway_type == rmp200 || this->segway_type == rmp400) {
+        this->rps_to_counts = 7.8;
+        this->mps_to_counts = 332.0;
+        this->meters_to_counts = 33215.0;
+        this->rev_to_counts = 112644.0;
+        this->torque_to_counts = 1094.0;
+    } else if (this->segway_type == rmp50 || this->segway_type == rmp100) {
+        this->rps_to_counts = 7.8;
+        this->mps_to_counts = 401.0;
+        this->meters_to_counts = 40181.0;
+        this->rev_to_counts = 117031.0;
+        this->torque_to_counts = 1463.0;
+    } else {
+        throw(ConfigurationException("SegwayType", "Inavlid Type"));
+    }
+}
+
 inline short int getShortInt(unsigned char high, unsigned char low) {
     return (short int)(((unsigned short int)high<<8)|(unsigned short int)low);
 }
@@ -527,37 +547,37 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
         case 0x0400: // COMMAND REQUEST
             break;
         case 0x0401:
-            _segway_status.pitch      = getShortInt(packet.data[0], packet.data[1])/7.8;
-            _segway_status.pitch_rate = getShortInt(packet.data[2], packet.data[3])/7.8;
-            _segway_status.roll       = getShortInt(packet.data[4], packet.data[5])/7.8;
-            _segway_status.roll_rate  = getShortInt(packet.data[6], packet.data[7])/7.8;
+            _segway_status.pitch      = getShortInt(packet.data[0], packet.data[1])/this->rps_to_counts;
+            _segway_status.pitch_rate = getShortInt(packet.data[2], packet.data[3])/this->rps_to_counts;
+            _segway_status.roll       = getShortInt(packet.data[4], packet.data[5])/this->rps_to_counts;
+            _segway_status.roll_rate  = getShortInt(packet.data[6], packet.data[7])/this->rps_to_counts;
             _segway_status.touched = true;
             break;
         case 0x0402:
-            _segway_status.left_wheel_speed  = getShortInt(packet.data[0], packet.data[1])/332.0;
-            _segway_status.right_wheel_speed = getShortInt(packet.data[2], packet.data[3])/332.0;
-            _segway_status.yaw_rate          = getShortInt(packet.data[4], packet.data[5])/7.8;
+            _segway_status.left_wheel_speed  = getShortInt(packet.data[0], packet.data[1])/this->mps_to_counts;
+            _segway_status.right_wheel_speed = getShortInt(packet.data[2], packet.data[3])/this->mps_to_counts;
+            _segway_status.yaw_rate          = getShortInt(packet.data[4], packet.data[5])/this->rps_to_counts;
             _segway_status.servo_frames      = ((((short unsigned int)packet.data[6])<<8) | 
                                                  ((short unsigned int)packet.data[7]))*0.01;
             _segway_status.touched = true;
             break;
         case 0x0403:
             _segway_status.integrated_left_wheel_position  = 
-                                            getInt(packet.data[0], packet.data[1], packet.data[2], packet.data[3])/33215.0;
+                                            getInt(packet.data[0], packet.data[1], packet.data[2], packet.data[3])/this->meters_to_counts;
             _segway_status.integrated_right_wheel_position = 
-                                            getInt(packet.data[4], packet.data[5], packet.data[6], packet.data[7])/33215.0;
+                                            getInt(packet.data[4], packet.data[5], packet.data[6], packet.data[7])/this->meters_to_counts;
             _segway_status.touched = true;
             break;
         case 0x0404:
             _segway_status.integrated_forward_position = 
-                                            getInt(packet.data[0], packet.data[1], packet.data[2], packet.data[3])/33215.0;
+                                            getInt(packet.data[0], packet.data[1], packet.data[2], packet.data[3])/this->meters_to_counts;
             _segway_status.integrated_turn_position    = 
-                                            getInt(packet.data[4], packet.data[5], packet.data[6], packet.data[7])/112644.0;
+                                            getInt(packet.data[4], packet.data[5], packet.data[6], packet.data[7])/this->rev_to_counts;
             _segway_status.touched = true;
             break;
         case 0x0405:
-            _segway_status.left_motor_torque  = getShortInt(packet.data[0], packet.data[1])/1094.0;
-            _segway_status.right_motor_torque = getShortInt(packet.data[2], packet.data[3])/1094.0;
+            _segway_status.left_motor_torque  = getShortInt(packet.data[0], packet.data[1])/this->torque_to_counts;
+            _segway_status.right_motor_torque = getShortInt(packet.data[2], packet.data[3])/this->torque_to_counts;
             _segway_status.touched = true;
             break;
         case 0x0406:
@@ -570,7 +590,7 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
             _segway_status.touched = true;
             break;
         case 0x0407:
-            _segway_status.commanded_velocity = (float)getShortInt(packet.data[0], packet.data[1])/MPS_TO_COUNTS;
+            _segway_status.commanded_velocity = (float)getShortInt(packet.data[0], packet.data[1])/this->mps_to_counts;
             _segway_status.commanded_yaw_rate = (float)getShortInt(packet.data[2], packet.data[3])/1024.0;
             status_updated = true;
             _segway_status.touched = true;
@@ -589,12 +609,6 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
 }
 
 void SegwayRMP::parsePacket(Packet &packet) {
-    // if (count % 10 != 0) {
-    //     count += 1;
-    //     return;
-    // } else {
-    //     count = 0;
-    // }
     bool status_updated = false;
     
     //printf("Packet id: %X, Packet Channel: %X, Packet Data: ", packet.id, packet.channel);
@@ -605,11 +619,8 @@ void SegwayRMP::parsePacket(Packet &packet) {
     // Messages come in order 0x0400, 0x0401, ... 0x0407 so a complete "cycle" of information has been sent every time we get an 0x0407
     if(status_updated) {
         if(this->callback_execution_thread_status) {
-            // boost::this_thread::sleep(boost::posix_time::microseconds(250));
-            // if(this->callback_execution_thread_status) {
                 this->error("Callback Falling behind, skipping packet report...");
                 return;
-            // }
         }
         this->callback_execution_thread.join(); // Should be instant
         this->callback_execution_thread = boost::thread(&SegwayRMP::executeCallback, this, this->segway_status);

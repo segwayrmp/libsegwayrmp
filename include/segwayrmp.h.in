@@ -61,28 +61,6 @@
 namespace segwayrmp {
 
 /*!
- * Converts Meters per Second to Counts to be sent to the segway.
- * 
- *      X meters   1 kilometer    1 mile     3600 seconds
- * X' = -------- * ----------- * --------- * ------------
- *       second    1000 meters   1.609 km        1 hr
- * 
- *           X' milesperhr    1176 counts
- * Command = ------------- * -------------  (From the datasheet)
- *                 1          8 milesperhr
- */
-static double MPS_TO_COUNTS = (1.0/1000.0)*(1.0/1.609)*(3600.0/1.0)*(1176.0/8.0);
-
-/*!
- * Converts Radians per Second to Counts to be sent to the segway.
- *
- *           X Radians    180 degrees   7.8 counts * second
- * Command = --------- * ------------ * -------------------
- *            second      pi radians         degree 
- */
-static double RPS_TO_COUNTS = (180.0/M_PI)*(7.8);
-
-/*!
  * Defines the possible modes of communication for the Segway Interface.
  */
 typedef enum {
@@ -91,6 +69,16 @@ typedef enum {
     serial  = 2, /*!< This method communicates to the Segway via a virtual serial port. */
     no_interface = -1
 } InterfaceType;
+
+/*!
+ * Defines the type of Segway RMP you are using.
+ */
+typedef enum {
+    rmp50   = 0, /*!< This indicates you have an RMP50 vehicle. */
+    rmp100  = 1, /*!< This indicates you have an RMP100 vehicle. */
+    rmp200  = 2, /*!< This indicates you have an RMP200 vehicle. */
+    rmp400  = 3  /*!< You still need to run two instances of SegwayRMP, this is the same as setting SegwayRMPType as rmp200. */
+} SegwayRMPType;
 
 /*!
  * Defines the operational modes of the Segway vehicle.
@@ -155,8 +143,9 @@ public:
      * Constructs the SegwayRMP object given the interface type.
      * 
      * \param interface_type This must be can, usb, or serial. Default is usb.
+     * \param segway_rmp_type This can be rmp50, rmp100, rmp200, or rmp400. Default is rmp200.
      */
-    SegwayRMP(InterfaceType interface_type = serial);
+    SegwayRMP(InterfaceType interface_type = serial, SegwayRMPType segway_rmp_type = rmp200);
     ~SegwayRMP();
     
     /*!
@@ -392,6 +381,7 @@ private:
     void parsePacket(Packet &packet);
     bool _parsePacket(Packet &packet, SegwayStatus &_segway_status);
     void executeCallback(SegwayStatus segway_status);
+    void configureSegwayType();
     void (*status_callback)(SegwayStatus &segway_status);
     void (*debug)(const std::string &msg);
     void (*info)(const std::string &msg);
@@ -421,7 +411,8 @@ private:
     // SegwayStatus Callback Execution Thread Status
     bool callback_execution_thread_status;
     
-    int count;
+    double mps_to_counts, rps_to_counts, meters_to_counts, rev_to_counts, torque_to_counts;
+    SegwayRMPType segway_type;
 };
 
 class ConnectionFailedException : public std::exception {
