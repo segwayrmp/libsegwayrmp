@@ -119,7 +119,7 @@ IF(FTD2XX_FOUND)
     
     list(APPEND SEGWAYRMP_SRCS src/impl/rmp_ftd2xx.cpp)
     
-    list(APPEND SEGWAYRMP_HEADERS_ORIG include/impl/rmp_ftd2xx.h)
+    list(APPEND SEGWAYRMP_HEADERS include/impl/rmp_ftd2xx.h)
     
     set(SEGWAYRMP_FTD2XX_SUPPORT TRUE)
 ELSE(FTD2XX_FOUND)
