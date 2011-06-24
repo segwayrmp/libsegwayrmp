@@ -411,7 +411,7 @@ private:
     // SegwayStatus Callback Execution Thread Status
     bool callback_execution_thread_status;
     
-    double mps_to_counts, rps_to_counts, meters_to_counts, rev_to_counts, torque_to_counts;
+    double mps_to_counts, dps_to_counts, meters_to_counts, rev_to_counts, torque_to_counts;
     SegwayRMPType segway_type;
 };
 

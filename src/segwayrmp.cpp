@@ -188,7 +188,7 @@ void SegwayRMP::move(float linear_velocity, float angular_velocity) {
         throw(MoveFailedException("Not Connected."));
     try {
         short int lv = (short int)(linear_velocity*this->mps_to_counts);
-        short int av = (short int)(angular_velocity*this->rps_to_counts);
+        short int av = (short int)(angular_velocity*this->dps_to_counts*1024.0);
         
         Packet packet;
         
@@ -510,13 +510,13 @@ void SegwayRMP::stopContinuousRead() {
 
 void SegwayRMP::configureSegwayType() {
     if (this->segway_type == rmp200 || this->segway_type == rmp400) {
-        this->rps_to_counts = 7.8;
+        this->dps_to_counts = 7.8;
         this->mps_to_counts = 332.0;
         this->meters_to_counts = 33215.0;
         this->rev_to_counts = 112644.0;
         this->torque_to_counts = 1094.0;
     } else if (this->segway_type == rmp50 || this->segway_type == rmp100) {
-        this->rps_to_counts = 7.8;
+        this->dps_to_counts = 7.8;
         this->mps_to_counts = 401.0;
         this->meters_to_counts = 40181.0;
         this->rev_to_counts = 117031.0;
@@ -547,16 +547,16 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
         case 0x0400: // COMMAND REQUEST
             break;
         case 0x0401:
-            _segway_status.pitch      = getShortInt(packet.data[0], packet.data[1])/this->rps_to_counts;
-            _segway_status.pitch_rate = getShortInt(packet.data[2], packet.data[3])/this->rps_to_counts;
-            _segway_status.roll       = getShortInt(packet.data[4], packet.data[5])/this->rps_to_counts;
-            _segway_status.roll_rate  = getShortInt(packet.data[6], packet.data[7])/this->rps_to_counts;
+            _segway_status.pitch      = getShortInt(packet.data[0], packet.data[1])/this->dps_to_counts;
+            _segway_status.pitch_rate = getShortInt(packet.data[2], packet.data[3])/this->dps_to_counts;
+            _segway_status.roll       = getShortInt(packet.data[4], packet.data[5])/this->dps_to_counts;
+            _segway_status.roll_rate  = getShortInt(packet.data[6], packet.data[7])/this->dps_to_counts;
             _segway_status.touched = true;
             break;
         case 0x0402:
             _segway_status.left_wheel_speed  = getShortInt(packet.data[0], packet.data[1])/this->mps_to_counts;
             _segway_status.right_wheel_speed = getShortInt(packet.data[2], packet.data[3])/this->mps_to_counts;
-            _segway_status.yaw_rate          = getShortInt(packet.data[4], packet.data[5])/this->rps_to_counts;
+            _segway_status.yaw_rate          = getShortInt(packet.data[4], packet.data[5])/this->dps_to_counts;
             _segway_status.servo_frames      = ((((short unsigned int)packet.data[6])<<8) | 
                                                  ((short unsigned int)packet.data[7]))*0.01;
             _segway_status.touched = true;
