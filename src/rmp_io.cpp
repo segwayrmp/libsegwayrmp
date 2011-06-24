@@ -10,6 +10,8 @@ inline void printHex(char * data, int length) {
 
 using namespace segwayrmp;
 
+static unsigned int BUFFER_SIZE = 256;
+
 /////////////////////////////////////////////////////////////////////////////
 // RMPIO
 

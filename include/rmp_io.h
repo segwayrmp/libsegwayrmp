@@ -55,8 +55,6 @@ typedef struct {
     unsigned char data[8]; /*!< Data bytes. */
 } Packet;
 
-static unsigned int BUFFER_SIZE = 36;
-
 /*!
  * Provides a generic interface for getting, building, manipulating, and sending packets.
  */

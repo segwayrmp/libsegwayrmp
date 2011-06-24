@@ -88,6 +88,7 @@ SegwayRMP::SegwayRMP(InterfaceType interface_type) {
     this->debug = defaultDebugMsgCallback;
     this->info = defaultInfoMsgCallback;
     this->error = defaultErrorMsgCallback;
+    this->count = 0;
 }
 
 SegwayRMP::~SegwayRMP() {
@@ -588,6 +589,12 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
 }
 
 void SegwayRMP::parsePacket(Packet &packet) {
+    // if (count % 10 != 0) {
+    //     count += 1;
+    //     return;
+    // } else {
+    //     count = 0;
+    // }
     bool status_updated = false;
     
     //printf("Packet id: %X, Packet Channel: %X, Packet Data: ", packet.id, packet.channel);
@@ -598,11 +605,14 @@ void SegwayRMP::parsePacket(Packet &packet) {
     // Messages come in order 0x0400, 0x0401, ... 0x0407 so a complete "cycle" of information has been sent every time we get an 0x0407
     if(status_updated) {
         if(this->callback_execution_thread_status) {
-            this->error("Callback Falling behind, skipping packet report...");
-        } else {
-            this->callback_execution_thread.join(); // Should be instant
-            this->callback_execution_thread = boost::thread(&SegwayRMP::executeCallback, this, this->segway_status);
+            // boost::this_thread::sleep(boost::posix_time::microseconds(250));
+            // if(this->callback_execution_thread_status) {
+                this->error("Callback Falling behind, skipping packet report...");
+                return;
+            // }
         }
+        this->callback_execution_thread.join(); // Should be instant
+        this->callback_execution_thread = boost::thread(&SegwayRMP::executeCallback, this, this->segway_status);
     }
 }
 

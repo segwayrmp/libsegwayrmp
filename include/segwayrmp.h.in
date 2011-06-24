@@ -420,6 +420,8 @@ private:
     
     // SegwayStatus Callback Execution Thread Status
     bool callback_execution_thread_status;
+    
+    int count;
 };
 
 class ConnectionFailedException : public std::exception {
