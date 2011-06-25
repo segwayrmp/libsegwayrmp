@@ -1,0 +1,481 @@
+/*!
+ * \file segwayrmp.h
+ * \author William Woodall <wjwwood@gmail.com>
+ * \version 0.1
+ *
+ * \section LICENSE
+ *
+ * The BSD License
+ *
+ * Copyright (c) 2011 William Woodall
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * \section DESCRIPTION
+ *
+ * This provides a cross platform interface for the Segway RMP's.
+ * 
+ * This library depends on Boost: http://www.boost.org/
+ * and possibly depends on a Serial library: https://github.com/wjwwood/serial
+ * and possibly depends on the FTD2XX driver: http://www.ftdichip.com/Drivers/D2XX.htm
+ * depending on the library build configuration.
+ */
+ 
+#ifndef SEGWAYRMP_H
+#define SEGWAYRMP_H
+
+#include <sstream>
+#include <iostream>
+#include <stdio.h>
+#include <math.h>
+
+#include "rmp_io.h"
+
+#define SEGWAYRMP_SERIAL_SUPPORT 0
+#define SEGWAYRMP_FTD2XX_SUPPORT 1
+
+#if SEGWAYRMP_SERIAL_SUPPORT
+#include "rmp_serial.h"
+#endif
+
+#if SEGWAYRMP_FTD2XX_SUPPORT
+#include "rmp_ftd2xx.h"
+#endif
+
+namespace segwayrmp {
+
+/*!
+ * Defines the possible modes of communication for the Segway Interface.
+ */
+typedef enum {
+    can     = 0, /*!< This method is unsupported currently. */
+    usb     = 1, /*!< This method communicates to the Segway via usb using the FTD2XX library. */
+    serial  = 2, /*!< This method communicates to the Segway via a virtual serial port. */
+    no_interface = -1
+} InterfaceType;
+
+/*!
+ * Defines the type of Segway RMP you are using.
+ */
+typedef enum {
+    rmp50   = 0, /*!< This indicates you have an RMP50 vehicle. */
+    rmp100  = 1, /*!< This indicates you have an RMP100 vehicle. */
+    rmp200  = 2, /*!< This indicates you have an RMP200 vehicle. */
+    rmp400  = 3  /*!< You still need to run two instances of SegwayRMP, this is the same as setting SegwayRMPType as rmp200. */
+} SegwayRMPType;
+
+/*!
+ * Defines the operational modes of the Segway vehicle.
+ */
+typedef enum {
+    disabled   = 0, /*!< This means the Segway has no been set to a mode yet. (This must be done before use) */
+    tractor    = 1, /*!< This mode means the Segway will move without balancing, i.e. it has a caster. */
+    balanced   = 2, /*!< This mode means the Segway will balance on its two drive wheels. */
+    power_down = 3  /*!< This mode means the Segway will power down. */
+} OperationalMode;
+
+/*!
+ * Defines the controller gain schedule options for the Segway vehicle.
+ */
+typedef enum {
+    light = 0, /*!< For relatively small weights (20 kg) near the platform */
+    tall  = 1, /*!< For relatively small weights (20 kg) spread out vertically on the platform */
+    heavy = 2  /*!< For heavy weights (40 kg) near the platform */
+} ControllerGainSchedule;
+
+/*!
+ * Contains Status Information returned by the Segway RMP.
+ */
+class SegwayStatus {
+public:
+    float pitch; /*!< Integrated Pitch in degrees. */
+    float pitch_rate; /*!< Current Pitch Aungular Velocity in degrees/second. */
+    float roll; /*!< Integrated Roll in degrees. */
+    float roll_rate; /*!< Current Roll Angular Velocity in degrees/second. */
+    float left_wheel_speed; /*!< Current Left Wheel Velocity in meters/second. */
+    float right_wheel_speed; /*!< Current Right Wheel Velocity in meters/second. */
+    float yaw_rate; /*!< Current Yaw Angular Velocity in degrees/second. */
+    float servo_frames; /*!< Current Servo Time in seconds (0.01 second intervals). */
+    float integrated_left_wheel_position; /*!< Integrated Left Wheel Position in meters. */
+    float integrated_right_wheel_position; /*!< Integrated Right Wheel Position in meters. */
+    float integrated_forward_position; /*!< Integrated Forward/Aft Displacement in meters. */
+    float integrated_turn_position; /*!< Integrated Yaw Angle in degrees. */
+    float left_motor_torque; /*!< Current Left Motor Torque in Newton-meters. */
+    float right_motor_torque; /*!< Current Right Motor Torque in Newton-meters. */
+    float ui_battery_voltage; /*!< Current UI Battery Voltage in Volts. */
+    float powerbase_battery_voltage; /*!< Current Powerbase Battery Voltage in Volts. */
+    OperationalMode operational_mode; /*!< Current Operational Mode one of {disabled, tractor, balanced, power_down}. */
+    ControllerGainSchedule controller_gain_schedule; /*!< Current Controller Gain Schedule (balance mode only) one of {light, tall, heavy}. */
+    float commanded_velocity; /*!< Current Commanded Velocity in meters/second. */
+    float commanded_yaw_rate; /*!< Current Commanded Angular Velocity in degrees/second. */
+    
+    int motor_status; /*!< Current Motor Status one of {Enabled = 1, Emergency-Stopped = 0}. */
+    
+    bool touched; /*!< For Testing Only. */
+    
+    SegwayStatus();
+    
+    std::string str();
+};
+
+/*!
+ * Provides an interface for the Segway RMP.
+ */
+class SegwayRMP {
+public:
+    /*!
+     * Constructs the SegwayRMP object given the interface type.
+     * 
+     * \param interface_type This must be can, usb, or serial. Default is usb.
+     * \param segway_rmp_type This can be rmp50, rmp100, rmp200, or rmp400. Default is rmp200.
+     */
+    SegwayRMP(InterfaceType interface_type = serial, SegwayRMPType segway_rmp_type = rmp200);
+    ~SegwayRMP();
+    
+    /*!
+     * Configures the serial interface, if the library is built with serial support, otherwise throws ConfigurationException.
+     * 
+     * \param port Defines which serial port to connect to in serial mode.
+     * \param baudrate Defines the speed of the serial port in baud's.  Defaults to 460800 (recommended).
+     */
+    void configureSerial(std::string port, int baudrate = 460800);
+    
+    /*!
+     * Configures the FTD2XX usb interface, if the library is built with usb support, otherwise throws ConfigurationException.
+     * 
+     * \param serial_number Defines which usb port to connect to based on the devices serial number.
+     * \param baudrate Defines the speed of the usb port in baud's.  Defaults to 460800 (recommended).
+     */
+    void configureUSBBySerial(std::string serial_number, int baudrate = 460800);
+    
+    /*!
+     * Configures the FTD2XX usb interface, if the library is built with usb support, otherwise throws ConfigurationException.
+     * 
+     * \param description Defines which usb port to connect to based on the devices description.
+     * \param baudrate Defines the speed of the usb port in baud's.  Defaults to 460800 (recommended).
+     */
+    void configureUSBByDescription(std::string description, int baudrate = 460800);
+    
+    /*!
+     * Configures the FTD2XX usb interface, if the library is built with usb support, otherwise throws ConfigurationException.
+     * 
+     * \param device_index Defines which usb port to connect to based on the devices index.
+     *              Note: This is indexed by all ftd2xx devices on the system.
+     * \param baudrate Defines the speed of the usb port in baud's.  Defaults to 460800 (recommended).
+     */
+    void configureUSBByIndex(int device_index, int baudrate = 460800);
+    
+    /*!
+     * Connects to the Segway.
+     * 
+     * \param operational_mode Defines the operation mode of the segway, this must be tractor or balanced to 
+     * have a successful connection.  If you want to connect to the Segway but not put it in a mode, use disabled (0).
+     * This will resulting in connecting to the Segway interface, but not setting the mode or controller gain schedule.
+     * Note: If you use default, you must manually set the operational mode and controller gain schedule. The default is tractor.
+     * \param controller_gain_schedule This is the controller gain schedule for the Segway vehicle, which is only
+     * used in balanced mode.  The default is light and is the appropriate option if using tractor mode.
+     */
+    void connect(OperationalMode operational_mode = tractor, ControllerGainSchedule controller_gain_schedule = light);
+    
+    /*!
+     * This command moves the base.
+     * 
+     * \param linear_velocity Forward/Reverse desired velocity of the vehicle in m/s.
+     * \param angular_velocity Desired angular velocity of the vehicle in degrees/s, positive to is left.
+     */
+    void move(float linear_velocity, float angular_velocity);
+    
+    /************ Getter and Setters ************/
+    
+    /*!
+     * Sets the operational mode.
+     * 
+     * \param operational_mode This must be disabled, tractor, or balanced.
+     */
+    void setOperationalMode(OperationalMode operational_mode);
+     
+    /*!
+     * Sets the controller gain schedule.
+     * 
+     * \param controller_gain_schedule This sets the contoller gain schedule, possible values are light, tall, and heavy.
+     */
+    void setControllerGainSchedule(ControllerGainSchedule controller_gain_schedule);
+    
+    /*!
+     * Locks or unlocks the balancing mode.
+     * 
+     * \param state This allows you to specify whether you want lock or unlock balancing mode. 
+     * True for locked and False for unlocked.  The default state is True.
+     */
+    void setBalanceModeLocking(bool state = true);
+    
+    /*!
+     * Resets all of the integrators.
+     * 
+     * \todo Add individual functions for reseting each integrator.
+     */
+    void resetAllIntegrators();
+    
+    /*!
+     * Sets the Max Velocity Scale Factor
+     *
+     * \param scalar This is a value between 0.0 and 1.0 which will set the
+     * scale factor on the segway internally for all velocity commands.
+     * Values larger than 1.0 will round down to 1.0 and values < 0 will round
+     * up to 0.0. Parameter defaults to 1.0.
+     */
+    void setMaxVelocityScaleFactor(double scalar = 1.0);
+    
+    /*!
+     * Sets the Max Acceleration Scale Factor
+     *
+     * \param scalar This is a value between 0.0 and 1.0 which will set the
+     * acceleration scale factor on the segway internally for all velocity commands.
+     * Values larger than 1.0 will round down to 1.0 and values < 0 will round
+     * up to 0.0. Parameter defaults to 1.0.
+     */
+    void setMaxAccelerationScaleFactor(double scalar = 1.0);
+    
+    /*!
+     * Sets the Max Turn Scale Factor
+     *
+     * \param scalar This is a value between 0.0 and 1.0 which will set the
+     * scale factor on the segway internally for all turn commands.
+     * Values larger than 1.0 will round down to 1.0 and values < 0 will round
+     * up to 0.0. Parameter defaults to 1.0.
+     */
+    void setMaxTurnScaleFactor(double scalar = 1.0);
+    
+    /*!
+     * Sets the Current Limit Scale Factor
+     *
+     * \param scalar This is a value between 0.0 and 1.0 which will set the
+     * current limit for the drive motors, limiting torque.
+     * Values larger than 1.0 will round down to 1.0 and values < 0 will round
+     * up to 0.0. Parameter defaults to 1.0.
+     */
+    void setCurrentLimitScaleFactor(double scalar = 1.0);
+    
+    /*!
+     * Sets the Callback Function to be called on new Segway Status Updates.
+     * 
+     * The provided function must follow this prototype:
+     * 
+     *    void yourSegwayStatusCallback(segwayrmp::SegwayStatus &segway_status)
+     * 
+     * Here is an example:
+     * 
+     *    void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
+     *        std::cout << ss.str() << std::endl << std::endl;
+     *    }
+     * 
+     * And the resulting call to make it the callback:
+     * 
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setStatusCallback(handleSegwayStatus);
+     * 
+     * \param status_callback A function pointer to the callback to handle new 
+     * SegwayStatus updates.
+     * \todo Make all the callbacks capable of taking class methods
+     */
+    void setStatusCallback(void (*status_callback)(SegwayStatus &segway_status));
+    
+    /*!
+     * Sets the Callback Function to be called on when debug messages occur.
+     * 
+     * This allows you to hook into the message reporting of the library and use
+     * your own logging facilities.
+     * 
+     * The provided function must follow this prototype:
+     * 
+     *    void yourDebugMsgCallback(const std::string &msg)
+     * 
+     * Here is an example:
+     * 
+     *    void yourDebugMsgCallback(const std::string &msg) {
+     *        std::cerr << "SegwayRMP Debug: " << msg << std::endl;
+     *    }
+     * 
+     * And the resulting call to make it the callback:
+     * 
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setDebugMsgCallback(yourDebugMsgCallback);
+     * 
+     * \param debug_callback A function pointer to the callback to handle new 
+     * Debug Messages.
+     */
+    void setDebugMsgCallback(void (*debug_callback)(const std::string &msg));
+    
+    /*!
+     * Sets the Callback Function to be called on when info messages occur.
+     * 
+     * This allows you to hook into the message reporting of the library and use
+     * your own logging facilities.
+     * 
+     * The provided function must follow this prototype:
+     * 
+     *    void yourInfoMsgCallback(const std::string &msg)
+     * 
+     * Here is an example:
+     * 
+     *    void yourInfoMsgCallback(const std::string &msg) {
+     *        std::cout << "SegwayRMP Info: " << msg << std::endl;
+     *    }
+     * 
+     * And the resulting call to make it the callback:
+     * 
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setInfoMsgCallback(yourInfoMsgCallback);
+     * 
+     * \param info_callback A function pointer to the callback to handle new 
+     * Info Messages.
+     */
+    void setInfoMsgCallback(void (*info_callback)(const std::string &msg));
+    
+    /*!
+     * Sets the Callback Function to be called on when error messages occur.
+     * 
+     * This allows you to hook into the message reporting of the library and use
+     * your own logging facilities.
+     * 
+     * The provided function must follow this prototype:
+     * 
+     *    void yourErrorMsgCallback(const std::string &msg)
+     * 
+     * Here is an example:
+     * 
+     *    void yourErrorMsgCallback(const std::string &msg) {
+     *        std::cerr << "SegwayRMP Error: " << msg << std::endl;
+     *    }
+     * 
+     * And the resulting call to make it the callback:
+     * 
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setErrorMsgCallback(yourErrorMsgCallback);
+     * 
+     * \param error_callback A function pointer to the callback to handle new 
+     * Error Messages.
+     * \todo Make all the callbacks capable of taking class methods
+     */
+    void setErrorMsgCallback(void (*error_callback)(const std::string &msg));
+private:
+    void readContinuously();
+    void startContinuousRead();
+    void stopContinuousRead();
+    void parsePacket(Packet &packet);
+    bool _parsePacket(Packet &packet, SegwayStatus &_segway_status);
+    void executeCallback(SegwayStatus segway_status);
+    void configureSegwayType();
+    void (*status_callback)(SegwayStatus &segway_status);
+    void (*debug)(const std::string &msg);
+    void (*info)(const std::string &msg);
+    void (*error)(const std::string &msg);
+    
+    // Interface Type
+    InterfaceType interface_type;
+    
+    // Communication interface
+    RMPIO * rmp_io;
+    
+    // Segway Status Object
+    SegwayStatus segway_status;
+    
+    // Connection Status
+    bool connected;
+    
+    // Continuous Read Thread
+    boost::thread continuous_read_thread;
+    
+    // Continuous Read status
+    bool continuous;
+    
+    // SegwayStatus Callback Execution Thread
+    boost::thread callback_execution_thread;
+    
+    // SegwayStatus Callback Execution Thread Status
+    bool callback_execution_thread_status;
+    
+    double mps_to_counts, dps_to_counts, meters_to_counts, rev_to_counts, torque_to_counts;
+    SegwayRMPType segway_type;
+};
+
+class ConnectionFailedException : public std::exception {
+    const char * e_what;
+public:
+    ConnectionFailedException(const char * e_what) {this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        std::stringstream ss;
+        ss << "Error connecting to SegwayRMP: " << this->e_what;
+        return ss.str().c_str();
+    }
+};
+
+class ReadFailedException : public std::exception {
+    const char * e_what;
+public:
+    ReadFailedException(const char * e_what) {this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        std::stringstream ss;
+        ss << "Error reading from the SegwayRMP: " << this->e_what;
+        return ss.str().c_str();
+    }
+};
+
+class WriteFailedException : public std::exception {
+    const char * e_what;
+public:
+    WriteFailedException(const char * e_what) {this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        std::stringstream ss;
+        ss << "Error writing to the SegwayRMP: " << this->e_what;
+        return ss.str().c_str();
+    }
+};
+
+class ConfigurationException : public std::exception {
+    const char * e_who;
+    const char * e_what;
+public:
+    ConfigurationException(const char* e_who, const char * e_what) {this->e_who = e_who; this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        std::stringstream ss;
+        ss << "Error configuring the " << this->e_who << " of the SegwayRMP: " << this->e_what;
+        return ss.str().c_str();
+    }
+};
+
+class MoveFailedException : public std::exception {
+    const char * e_what;
+public:
+    MoveFailedException(const char * e_what) {this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        std::stringstream ss;
+        ss << "Error moving the SegwayRMP: " << this->e_what;
+        return ss.str().c_str();
+    }
+};
+
+} // Namespace segwayrmp
+
+#endif
