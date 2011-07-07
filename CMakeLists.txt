@@ -83,7 +83,7 @@ IF(serial_FOUND)
     list(APPEND SEGWAYRMP_HEADERS include/impl/rmp_serial.h)
     
     set(SEGWAYRMP_SERIAL_SUPPORT TRUE)
-ELSE(FTD2XX_FOUND)
+ELSE(serial_FOUND)
     set(SEGWAYRMP_SERIAL_SUPPORT FALSE)
 ENDIF(serial_FOUND)
 
