@@ -573,6 +573,7 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
                                             getInt(packet.data[0], packet.data[1], packet.data[2], packet.data[3])/this->meters_to_counts;
             _segway_status.integrated_turn_position    = 
                                             getInt(packet.data[4], packet.data[5], packet.data[6], packet.data[7])/this->rev_to_counts;
+			_segway_status.integrated_turn_position *= 360.0; // convert from revolutions to degrees
             _segway_status.touched = true;
             break;
         case 0x0405:
