@@ -28,10 +28,9 @@ Or run cmake youself:
     cmake ..
     make
 
-Install the code:
+Install the code (UNIX):
 
     make
-    cd build
     sudo make install
 
 Uninstall the code (UNIX):
