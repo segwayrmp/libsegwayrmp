@@ -34,13 +34,12 @@ Install the code:
     cd build
     sudo make install
 
-Uninstall the code:
+Uninstall the code (UNIX):
 
     make
-    cd build
     sudo make uninstall
 
-Run the test:
+Run the test (Requires GTest):
 
     make test
 
