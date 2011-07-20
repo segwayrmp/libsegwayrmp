@@ -1,0 +1,16 @@
+Future changesets:
+
+==== version 0.1 - Release Candidate 2
+DONE:
+* 
+
+TODO:
+* Add the documentation section "Using the segwayrmp library in your project"
+* Change the callbacks to use Boost functions so both free functions and method functions can be used as callbacks (via boost bind).
+* Acceptance test the data being published for sanity.
+
+
+Past changesets:
+
+==== Version 0.1 - Release Candidate 1
+* Added a unit conversion fix from David Rajaratnam (daver@cse.unsw.edu.au)
