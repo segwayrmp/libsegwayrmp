@@ -16,6 +16,89 @@ inline void defaultErrorMsgCallback(const std::string &msg) {
     std::cerr << "SegwayRMP Error: " << msg << std::endl;
 }
 
+// This is from ROS's walltime function
+// http://www.ros.org/doc/api/rostime/html/time_8cpp_source.html
+inline segwayrmp::SegwayTime defaultTimestampCallback()
+#ifndef WIN32
+    throw(segwayrmp::NoHighPerformanceTimersException)
+#endif
+  {
+    segwayrmp::SegwayTime st;
+#ifndef WIN32
+#if HAS_CLOCK_GETTIME
+    timespec start;
+    clock_gettime(CLOCK_REALTIME, &start);
+    st.sec  = start.tv_sec;
+    st.nsec = start.tv_nsec;
+#else
+    struct timeval timeofday;
+    gettimeofday(&timeofday,NULL);
+    st.sec  = timeofday.tv_sec;
+    st.nsec = timeofday.tv_usec * 1000;
+#endif
+#else
+    // Win32 implementation
+    // unless I've missed something obvious, the only way to get high-precision
+    // time on Windows is via the QueryPerformanceCounter() call. However,
+    // this is somewhat problematic in Windows XP on some processors, especially
+    // AMD, because the Windows implementation can freak out when the CPU clocks
+    // down to save power. Time can jump or even go backwards. Microsoft has
+    // fixed this bug for most systems now, but it can still show up if you have
+    // not installed the latest CPU drivers (an oxymoron). They fixed all these
+    // problems in Windows Vista, and this API is by far the most accurate that
+    // I know of in Windows, so I'll use it here despite all these caveats
+    static LARGE_INTEGER cpu_freq, init_cpu_time;
+    uint32_t start_sec = 0;
+    uint32_t start_nsec = 0;
+    if ( ( start_sec == 0 ) && ( start_nsec == 0 ) )
+      {
+        QueryPerformanceFrequency(&cpu_freq);
+        if (cpu_freq.QuadPart == 0) {
+          throw segwayrmp::NoHighPerformanceTimersException();
+        }
+        QueryPerformanceCounter(&init_cpu_time);
+        // compute an offset from the Epoch using the lower-performance timer API
+        FILETIME ft;
+        GetSystemTimeAsFileTime(&ft);
+        LARGE_INTEGER start_li;
+        start_li.LowPart = ft.dwLowDateTime;
+        start_li.HighPart = ft.dwHighDateTime;
+        // why did they choose 1601 as the time zero, instead of 1970?
+        // there were no outstanding hard rock bands in 1601.
+#ifdef _MSC_VER
+        start_li.QuadPart -= 116444736000000000Ui64;
+#else
+        start_li.QuadPart -= 116444736000000000ULL;
+#endif
+        start_sec = (uint32_t)(start_li.QuadPart / 10000000); // 100-ns units. odd.
+        start_nsec = (start_li.LowPart % 10000000) * 100;
+      }
+    LARGE_INTEGER cur_time;
+    QueryPerformanceCounter(&cur_time);
+    LARGE_INTEGER delta_cpu_time;
+    delta_cpu_time.QuadPart = cur_time.QuadPart - init_cpu_time.QuadPart;
+    // todo: how to handle cpu clock drift. not sure it's a big deal for us.
+    // also, think about clock wraparound. seems extremely unlikey, but possible
+    double d_delta_cpu_time = delta_cpu_time.QuadPart / (double) cpu_freq.QuadPart;
+    uint32_t delta_sec = (uint32_t) floor(d_delta_cpu_time);
+    uint32_t delta_nsec = (uint32_t) boost::math::round((d_delta_cpu_time-delta_sec) * 1e9);
+    
+    int64_t sec_sum  = (int64_t)start_sec  + (int64_t)delta_sec;
+    int64_t nsec_sum = (int64_t)start_nsec + (int64_t)delta_nsec;
+    
+    // Throws an exception if we go out of 32-bit range
+    normalizeSecNSecUnsigned(sec_sum, nsec_sum);
+    
+    st.sec = sec_sum;
+    st.nsec = nsec_sum;
+#endif
+    return st;
+}
+
+inline void defaultExceptionCallback(const std::exception &error) {
+    std::cerr << "SegwayRMP Unhandled Exception: " << error.what() << std::endl;
+}
+
 inline void printHex(char * data, int length) {
     for(int i = 0; i < length; ++i) {
         printf("0x%.2X ", (unsigned)(unsigned char)data[i]);
@@ -30,6 +113,7 @@ inline void printHexFromString(std::string str) {
 using namespace segwayrmp;
 
 SegwayStatus::SegwayStatus() {
+    timestamp = SegwayTime(0,0);
     pitch, pitch_rate, roll, roll_rate, left_wheel_speed, right_wheel_speed,
     yaw_rate, servo_frames, integrated_left_wheel_position,
     integrated_right_wheel_position, integrated_forward_position,
@@ -43,6 +127,8 @@ SegwayStatus::SegwayStatus() {
 std::string SegwayStatus::str() {
     std::stringstream ss;
     ss << "Segway Status: ";
+    ss << "\n  Seconds: " << timestamp.sec;
+    ss << "\n  Nanoseconds: " << timestamp.nsec;
     ss << "\nPitch: " << pitch << "\nPitch Rate: " << pitch_rate << "\nRoll: " << roll;
     ss << "\nRoll Rate: " << roll_rate << "\nLeft Wheel Speed: " << left_wheel_speed;
     ss << "\nRight Wheel Speed: " << right_wheel_speed << "\nYaw Rate: " << yaw_rate;
@@ -89,6 +175,8 @@ SegwayRMP::SegwayRMP(InterfaceType interface_type, SegwayRMPType segway_rmp_type
     this->debug = defaultDebugMsgCallback;
     this->info = defaultInfoMsgCallback;
     this->error = defaultErrorMsgCallback;
+    this->get_time = defaultTimestampCallback;
+    this->handle_exception = defaultExceptionCallback;
     
     this->configureSegwayType();
 }
@@ -465,20 +553,28 @@ void SegwayRMP::setCurrentLimitScaleFactor(double scalar) {
     }
 }
 
-void SegwayRMP::setStatusCallback(void (*status_callback)(SegwayStatus &segway_status)) {
+void SegwayRMP::setStatusCallback(SegwayStatusCallback status_callback) {
     this->status_callback = status_callback;
 }
 
-void SegwayRMP::setDebugMsgCallback(void (*debug_callback)(const std::string &msg)) {
+void SegwayRMP::setDebugMsgCallback(DebugMsgCallback debug_callback) {
     this->debug = debug_callback;
 }
 
-void SegwayRMP::setInfoMsgCallback(void (*info_callback)(const std::string &msg)) {
+void SegwayRMP::setInfoMsgCallback(InfoMsgCallback info_callback) {
     this->info = info_callback;
 }
 
-void SegwayRMP::setErrorMsgCallback(void (*error_callback)(const std::string &msg)) {
+void SegwayRMP::setErrorMsgCallback(ErrorMsgCallback error_callback) {
     this->error = error_callback;
+}
+
+void SegwayRMP::setTimestampCallback(TimestampCallback timestamp_callback) {
+    this->get_time = timestamp_callback;
+}
+
+void SegwayRMP::setExceptionCallback(ExceptionCallback exception_callback) {
+  this->handle_exception = exception_callback;
 }
 
 void SegwayRMP::readContinuously() {
@@ -493,7 +589,7 @@ void SegwayRMP::readContinuously() {
             else if(e.error_number() == 3) // No packet received
                 this->error("No data from Segway...");
             else
-                throw(e);
+                this->handle_exception(e);
         }
     }
 }
@@ -545,6 +641,8 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
     // This section comes largerly from the Segway example code
     switch (packet.id) {
         case 0x0400: // COMMAND REQUEST
+            // This is the first packet of a msg series, timestamp here.
+            _segway_status.timestamp  = this->get_time();
             break;
         case 0x0401:
             _segway_status.pitch      = getShortInt(packet.data[0], packet.data[1])/this->dps_to_counts;
@@ -573,7 +671,7 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
                                             getInt(packet.data[0], packet.data[1], packet.data[2], packet.data[3])/this->meters_to_counts;
             _segway_status.integrated_turn_position    = 
                                             getInt(packet.data[4], packet.data[5], packet.data[6], packet.data[7])/this->rev_to_counts;
-			_segway_status.integrated_turn_position *= 360.0; // convert from revolutions to degrees
+            _segway_status.integrated_turn_position *= 360.0; // convert from revolutions to degrees
             _segway_status.touched = true;
             break;
         case 0x0405:
@@ -628,8 +726,13 @@ void SegwayRMP::parsePacket(Packet &packet) {
     }
 }
 
-void SegwayRMP::executeCallback(SegwayStatus segway_status) {
+void SegwayRMP::executeCallback(SegwayStatus this_segway_status) {
     this->callback_execution_thread_status = true;
-    this->status_callback(this->segway_status);
+    try {
+      this->status_callback(this_segway_status);
+    } catch (std::exception &e) {
+      this->callback_execution_thread_status = false;
+      this->handle_exception(e);
+    }
     this->callback_execution_thread_status = false;
 }

@@ -47,8 +47,8 @@
 
 #include "rmp_io.h"
 
-#define SEGWAYRMP_SERIAL_SUPPORT 0
-#define SEGWAYRMP_FTD2XX_SUPPORT 1
+#define SEGWAYRMP_SERIAL_SUPPORT 1
+#define SEGWAYRMP_FTD2XX_SUPPORT 0
 
 #if SEGWAYRMP_SERIAL_SUPPORT
 #include "rmp_serial.h"
@@ -100,10 +100,36 @@ typedef enum {
 } ControllerGainSchedule;
 
 /*!
+ * Represents the time of a timestamp using seconds and nanoseconds.
+ */
+class SegwayTime
+{
+public:
+  SegwayTime (uint32_t sec = 0, uint32_t nsec = 0) {
+    this->sec = sec;
+    this->nsec = nsec;
+  }
+  
+  uint32_t sec; /*!< Seconds since the epoch (1970). */
+  uint32_t nsec; /*!< Nanoseconds since the last second. */
+};
+
+class NoHighPerformanceTimersException : public std::exception {
+    const char * e_what;
+public:
+    NoHighPerformanceTimersException(const char * e_what) {this->e_what = e_what;}
+    
+    virtual const char* what() const throw() {
+        return "This system does not have a High Precision Timing device.";
+    }
+};
+
+/*!
  * Contains Status Information returned by the Segway RMP.
  */
 class SegwayStatus {
 public:
+    SegwayTime timestamp; /*!< Time that this data was received. */
     float pitch; /*!< Integrated Pitch in degrees. */
     float pitch_rate; /*!< Current Pitch Aungular Velocity in degrees/second. */
     float roll; /*!< Integrated Roll in degrees. */
@@ -133,6 +159,13 @@ public:
     
     std::string str();
 };
+
+typedef boost::function<void(SegwayStatus&)> SegwayStatusCallback;
+typedef boost::function<void(const std::string&)> DebugMsgCallback;
+typedef boost::function<void(const std::string&)> InfoMsgCallback;
+typedef boost::function<void(const std::string&)> ErrorMsgCallback;
+typedef boost::function<SegwayTime(void)> TimestampCallback;
+typedef boost::function<void(const std::exception&)> ExceptionCallback;
 
 /*!
  * Provides an interface for the Segway RMP.
@@ -276,25 +309,46 @@ public:
      * Sets the Callback Function to be called on new Segway Status Updates.
      * 
      * The provided function must follow this prototype:
-     * 
+     * <pre>
      *    void yourSegwayStatusCallback(segwayrmp::SegwayStatus &segway_status)
-     * 
+     * </pre>
      * Here is an example:
-     * 
+     * <pre>
      *    void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
      *        std::cout << ss.str() << std::endl << std::endl;
      *    }
-     * 
+     * </pre>
      * And the resulting call to make it the callback:
-     * 
+     * <pre>
      *    segwayrmp::SegwayRMP my_segway_rmp;
      *    my_segway_rmp.setStatusCallback(handleSegwayStatus);
-     * 
+     * </pre>
+     * Alternatively you can use a class method as a callback using boost::bind:
+     * <pre>
+     *    #include <boost/bind.hpp>
+     *    
+     *    #include "segwayrmp.h"
+     *    
+     *    class MySegwayWrapper
+     *    {
+     *    public:
+     *     MySegwayWrapper () {
+     *      my_segway_rmp.setStatusCallback(boost::bind(&MySegwayWrapper::handleSegwayStatus, this, _1));
+     *     }
+     *    
+     *     void handleSegwayStatus(segwayrmp::SegwayStatus &ss) {
+     *       std::cout << ss.str() << std::endl << std::endl;
+     *     }
+     *    
+     *    private:
+     *     segwayrmp::SegwayRMP my_segway_rmp;
+     *    };
+     * </pre>
      * \param status_callback A function pointer to the callback to handle new 
      * SegwayStatus updates.
      * \todo Make all the callbacks capable of taking class methods
      */
-    void setStatusCallback(void (*status_callback)(SegwayStatus &segway_status));
+    void setStatusCallback(SegwayStatusCallback);
     
     /*!
      * Sets the Callback Function to be called on when debug messages occur.
@@ -303,24 +357,45 @@ public:
      * your own logging facilities.
      * 
      * The provided function must follow this prototype:
-     * 
+     * <pre>
      *    void yourDebugMsgCallback(const std::string &msg)
-     * 
+     * </pre>
      * Here is an example:
-     * 
+     * <pre>
      *    void yourDebugMsgCallback(const std::string &msg) {
      *        std::cerr << "SegwayRMP Debug: " << msg << std::endl;
      *    }
-     * 
+     * </pre>
      * And the resulting call to make it the callback:
-     * 
+     * <pre>
      *    segwayrmp::SegwayRMP my_segway_rmp;
      *    my_segway_rmp.setDebugMsgCallback(yourDebugMsgCallback);
-     * 
+     * </pre>
+     * Alternatively you can use a class method as a callback using boost::bind:
+     * <pre>
+     *    #include <boost/bind.hpp>
+     *    
+     *    #include "segwayrmp.h"
+     *    
+     *    class MySegwayWrapper
+     *    {
+     *    public:
+     *     MySegwayWrapper () {
+     *      my_segway_rmp.setDebugMsgCallback(boost::bind(&MySegwayWrapper::handleDebugMsg, this, _1));
+     *     }
+     *    
+     *     void handleDebugMsg(const std::string &msg) {
+     *       std::cerr << "SegwayRMP Debug: " << msg << std::endl;
+     *     }
+     *    
+     *    private:
+     *     segwayrmp::SegwayRMP my_segway_rmp;
+     *    };
+     * </pre>
      * \param debug_callback A function pointer to the callback to handle new 
      * Debug Messages.
      */
-    void setDebugMsgCallback(void (*debug_callback)(const std::string &msg));
+    void setDebugMsgCallback(DebugMsgCallback);
     
     /*!
      * Sets the Callback Function to be called on when info messages occur.
@@ -329,24 +404,44 @@ public:
      * your own logging facilities.
      * 
      * The provided function must follow this prototype:
-     * 
+     * <pre>
      *    void yourInfoMsgCallback(const std::string &msg)
-     * 
+     * </pre>
      * Here is an example:
-     * 
+     * <pre>
      *    void yourInfoMsgCallback(const std::string &msg) {
      *        std::cout << "SegwayRMP Info: " << msg << std::endl;
      *    }
-     * 
+     * </pre>
      * And the resulting call to make it the callback:
-     * 
+     * <pre>
      *    segwayrmp::SegwayRMP my_segway_rmp;
      *    my_segway_rmp.setInfoMsgCallback(yourInfoMsgCallback);
-     * 
+     * </pre>
+     * Alternatively you can use a class method as a callback using boost::bind:
+     * <pre>
+     *    #include <boost/bind.hpp>
+     *    
+     *    #include "segwayrmp.h"
+     *    
+     *    class MySegwayWrapper
+     *    {
+     *    public:
+     *     MySegwayWrapper () {
+     *      my_segway_rmp.setInfoMsgCallback(boost::bind(&MySegwayWrapper::handleInfoMsg, this, _1));
+     *     }
+     *     void handleInfoMsg(const std::string &msg) {
+     *       std::cout << "SegwayRMP Info: " << msg << std::endl;
+     *     }
+     *    
+     *    private:
+     *     segwayrmp::SegwayRMP my_segway_rmp;
+     *    };
+     * </pre>
      * \param info_callback A function pointer to the callback to handle new 
      * Info Messages.
      */
-    void setInfoMsgCallback(void (*info_callback)(const std::string &msg));
+    void setInfoMsgCallback(InfoMsgCallback);
     
     /*!
      * Sets the Callback Function to be called on when error messages occur.
@@ -355,25 +450,150 @@ public:
      * your own logging facilities.
      * 
      * The provided function must follow this prototype:
-     * 
+     * <pre>
      *    void yourErrorMsgCallback(const std::string &msg)
-     * 
+     * </pre>
      * Here is an example:
-     * 
+     * <pre>
      *    void yourErrorMsgCallback(const std::string &msg) {
      *        std::cerr << "SegwayRMP Error: " << msg << std::endl;
      *    }
-     * 
+     * </pre>
      * And the resulting call to make it the callback:
-     * 
+     * <pre>
      *    segwayrmp::SegwayRMP my_segway_rmp;
      *    my_segway_rmp.setErrorMsgCallback(yourErrorMsgCallback);
-     * 
+     * </pre>
+     * Alternatively you can use a class method as a callback using boost::bind:
+     * <pre>
+     *    #include <boost/bind.hpp>
+     *    
+     *    #include "segwayrmp.h"
+     *    
+     *    class MySegwayWrapper
+     *    {
+     *    public:
+     *     MySegwayWrapper () {
+     *       my_segway_rmp.setErrorMsgCallback(boost::bind(&MySegwayWrapper::handleErrorMsg, this, _1));
+     *     }
+     *     void handleErrorMsg(const std::string &msg) {
+     *       std::cerr << "SegwayRMP Error: " << msg << std::endl;
+     *     }
+     *    
+     *    private:
+     *     segwayrmp::SegwayRMP my_segway_rmp;
+     *    };
+     * </pre>
      * \param error_callback A function pointer to the callback to handle new 
      * Error Messages.
-     * \todo Make all the callbacks capable of taking class methods
      */
-    void setErrorMsgCallback(void (*error_callback)(const std::string &msg));
+    void setErrorMsgCallback(ErrorMsgCallback);
+    
+    /*!
+     * Sets the Callback Function to be called on when a timestamp is made.
+     * 
+     * This allows you to provide your own time stamp method for time stamping 
+     * the segway data.  You must return a SegwayTimeStruct, but you can return
+     * an empty time struct and manually store your time stamp and use your 
+     * timestamp when processing the segway status callback.
+     * 
+     * The provided function must follow this prototype:
+     * <pre>
+     *    SegwayTime yourTimestampCallback()
+     * </pre>
+     * Here is an example:
+     * <pre>
+     *    SegwayTime yourTimestampCallback() {
+     *        SegwayTime st;
+     *        timespec start;
+     *        clock_gettime(CLOCK_REALTIME, &start);
+     *        st.sec  = start.tv_sec;
+     *        st.nsec = start.tv_nsec;
+     *        return st;
+     *    }
+     * </pre>
+     * And the resulting call to make it the callback:
+     * <pre>
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setTimestampCallback(yourTimestampCallback);
+     * </pre>
+     * Alternatively you can use a class method as a callback using boost::bind:
+     * <pre>
+     *    #include <boost/bind.hpp>
+     *    #include <ctime>
+     *    
+     *    #include "segwayrmp.h"
+     *    
+     *    class MySegwayWrapper
+     *    {
+     *    public:
+     *     MySegwayWrapper () {
+     *       my_segway_rmp.setTimestampCallback(boost::bind(&MySegwayWrapper::handleTimestamp, this, _1));
+     *     }
+     *     SegwayTime handleTimestamp() {
+     *        SegwayTime st;
+     *        timespec start;
+     *        clock_gettime(CLOCK_REALTIME, &start);
+     *        st.sec  = start.tv_sec;
+     *        st.nsec = start.tv_nsec;
+     *        return st;
+     *     }
+     *    
+     *    private:
+     *     segwayrmp::SegwayRMP my_segway_rmp;
+     *    };
+     * </pre>
+     * \param timestamp_callback A function pointer to the callback to handle 
+     * Timestamp creation.
+     */
+    void setTimestampCallback(TimestampCallback);
+    
+    /*!
+     * Sets the Callback Function to be called on when an unhandled exception occurs.
+     * 
+     * This allows you to catch and handle otherwise unhandled exceptions that might occur in 
+     * an internal thread to the segwayrmp library.
+     * 
+     * The provided function must follow this prototype:
+     * <pre>
+     *    void yourExceptionCallback(const std::exception&)
+     * </pre>
+     * Here is an example:
+     * <pre>
+     *    SegwayTime yourTimestampCallback() {
+     *        std::cerr << "SegwayRMP Unhandled Exception: " << error.what() << std::endl;
+     *    }
+     * </pre>
+     * And the resulting call to make it the callback:
+     * <pre>
+     *    segwayrmp::SegwayRMP my_segway_rmp;
+     *    my_segway_rmp.setExceptionCallback(yourExceptionCallback);
+     * </pre>
+     * Alternatively you can use a class method as a callback using boost::bind:
+     * <pre>
+     *    #include <boost/bind.hpp>
+     *    #include <ctime>
+     *    
+     *    #include "segwayrmp.h"
+     *    
+     *    class MySegwayWrapper
+     *    {
+     *    public:
+     *     MySegwayWrapper () {
+     *       my_segway_rmp.setExceptionCallback(boost::bind(&MySegwayWrapper::handleException, this, _1));
+     *     }
+     *     SegwayTime handleException() {
+     *        std::cerr << "SegwayRMP Unhandled Exception: " << error.what() << std::endl;
+     *     }
+     *    
+     *    private:
+     *     segwayrmp::SegwayRMP my_segway_rmp;
+     *    };
+     * </pre>
+     * \param exception_callback A function pointer to the callback to handle 
+     * otherwise unhandled exceptions that occur.
+     */
+    void setExceptionCallback(ExceptionCallback);
 private:
     void readContinuously();
     void startContinuousRead();
@@ -382,10 +602,12 @@ private:
     bool _parsePacket(Packet &packet, SegwayStatus &_segway_status);
     void executeCallback(SegwayStatus segway_status);
     void configureSegwayType();
-    void (*status_callback)(SegwayStatus &segway_status);
-    void (*debug)(const std::string &msg);
-    void (*info)(const std::string &msg);
-    void (*error)(const std::string &msg);
+    SegwayStatusCallback status_callback;
+    DebugMsgCallback debug;
+    InfoMsgCallback info;
+    ErrorMsgCallback error;
+    TimestampCallback get_time;
+    ExceptionCallback handle_exception;
     
     // Interface Type
     InterfaceType interface_type;
