@@ -48,7 +48,7 @@
 #include "rmp_io.h"
 
 #define SEGWAYRMP_SERIAL_SUPPORT 1
-#define SEGWAYRMP_FTD2XX_SUPPORT 0
+#define SEGWAYRMP_FTD2XX_SUPPORT 1
 
 #if SEGWAYRMP_SERIAL_SUPPORT
 #include "rmp_serial.h"

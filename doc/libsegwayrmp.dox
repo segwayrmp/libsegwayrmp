@@ -6,6 +6,10 @@
 \section what_is What is libsegwayrmp?
 Simply put, it is a library for interfacing with Segway's RMP line of robotic platforms.
 
+Want to use it in your own library? \ref inyourlibrary
+
+Want to use it with ROS(Robot Operating System)? http://www.ros.org/wiki/segway_rmp
+
 \section features Features
 - Linux and Mac OS X Support
 - Multiple Interface Methods:
@@ -58,4 +62,42 @@ To uninstall simply:
 <pre>
     sudo make uninstall
 </pre>
+
+\page inyourlibrary Using libsegwayrmp in your project
+
+libsegwayrmp is not intended to be used stand alone.  Therefore special consideration was given in the design of the build system that should allow easier integration into existing projects and middlewares.  Additionally, you can make libsegwayrmp a dependency by requiring it be installed to the system (i.e. `make install` on libsegwayrmp) and then you can use normal methods to include it into your project.
+
+\section buildsystem Build System
+
+The build system used is cmake, and currently you best option for integrating is to also use cmake.
+
+\subsection buildflags CMAKE Variables
+
+There are several cmake variables that can be set to control how the libsegwayrmp library is built.
+
+- SEGWAYRMP_BUILD_TESTS (ON or OFF):
+ - This variable controls whether or not the tests are built for libsegwayrmp. Default is OFF.
+- SEGWAYRMP_BUILD_EXAMPLES (ON or OFF):
+ - This variable controls whether or not the tests are builr for libsegwayrmp. Default is OFF.
+- SEGWAYRMP_USE_SERIAL (ON or OFF):
+ - This variable controls whether or not support for Serial communication is built. Default is ON.
+- SEGWAYRMP_USE_FTD2XX (ON or OFF):
+ - This variable controls whether or not support for FTD2XX communication is built. Default is ON.
+
+\subsection depedency_resolution Resolving Dependencies
+
+If you do not ensure that the optional dependencies are found then some support might be disabled by the build system.  For example, if you enable Serial communication support, but do not have the serial library installed on your system or you do not manually build and specify the serial library then support will be disabled because it cannot find the library.  By default the serial library dependency can be overridden by setting a few CMAKE variables.  This is an example snippet of Makefile that manually specifying how to find the serial library, notice how the serial_* cmake variable are set to override the use of FindSerial.cmake:
+
+<pre>
+    CMAKE_ARGS = -D serial_FOUND=TRUE \
+                 -D serial_INCLUDE_DIRS="$(shell rospack find serial_segway_rmp)/include/"
+    ifeq ($(UNAME), Darwin)
+        CMAKE_ARGS += -D serial_LIBRARIES="$(shell rospack find serial_segway_rmp)/lib/libserial.dylib"
+    else
+        CMAKE_ARGS += -D serial_LIBRARIES="$(shell rospack find serial_segway_rmp)/lib/libserial.a"
+    endif
+    
+    cd build \&\& cmake $(CMAKE_ARGS) ..
+</pre>
+
  */
