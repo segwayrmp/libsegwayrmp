@@ -169,8 +169,7 @@ SegwayRMP::SegwayRMP(InterfaceType interface_type, SegwayRMPType segway_rmp_type
     } else {
         throw(ConfigurationException("InterfaceType", "The specified interface type is not supported or invalid."));
     }
-    this->callback_execution_thread_status = false;
-    
+
     this->status_callback = defaultSegwayStatusCallback;
     this->debug = defaultDebugMsgCallback;
     this->info = defaultInfoMsgCallback;
@@ -596,12 +595,17 @@ void SegwayRMP::readContinuously() {
 
 void SegwayRMP::startContinuousRead() {
     this->continuous = true;
-    this->continuous_read_thread = boost::thread(&SegwayRMP::readContinuously, this);
+    this->continuous_read_thread = 
+      boost::thread(&SegwayRMP::readContinuously, this);
+    this->callback_execution_thread = 
+      boost::thread(&SegwayRMP::executeCallback, this);
 }
 
 void SegwayRMP::stopContinuousRead() {
     this->continuous = false;
     this->continuous_read_thread.join();
+    this->ss_queue.cancel();
+    this->callback_execution_thread.join();
 }
 
 void SegwayRMP::configureSegwayType() {
@@ -708,31 +712,32 @@ bool SegwayRMP::_parsePacket(Packet &packet, SegwayStatus &_segway_status) {
 }
 
 void SegwayRMP::parsePacket(Packet &packet) {
-    bool status_updated = false;
-    
-    //printf("Packet id: %X, Packet Channel: %X, Packet Data: ", packet.id, packet.channel);
-    //printHex(reinterpret_cast<char *>(packet.data), 8);
-    
-    status_updated = this->_parsePacket(packet, this->segway_status);
-    
-    // Messages come in order 0x0400, 0x0401, ... 0x0407 so a complete "cycle" of information has been sent every time we get an 0x0407
-    if(status_updated) {
-        if(this->callback_execution_thread_status) {
-                this->error("Callback Falling behind, skipping packet report...");
-                return;
-        }
-        this->callback_execution_thread.join(); // Should be instant
-        this->callback_execution_thread = boost::thread(&SegwayRMP::executeCallback, this, this->segway_status);
+  bool status_updated = false;
+
+  status_updated = this->_parsePacket(packet, this->segway_status);
+
+  // Messages come in order 0x0400, 0x0401, ... 0x0407 so a
+  //  complete "cycle" of information has been sent every
+  //  time we get an 0x0407
+  if (status_updated) {
+    if (this->ss_queue.size() < MAX_SEGWAYSTATUS_QUEUE_SIZE) {
+      this->error("Falling behind, SegwayStatus Queue Full, skipping packet report...");
+    } else {
+      this->ss_queue.push(this->segway_status);
     }
+  }
 }
 
-void SegwayRMP::executeCallback(SegwayStatus this_segway_status) {
-    this->callback_execution_thread_status = true;
-    try {
-      this->status_callback(this_segway_status);
-    } catch (std::exception &e) {
-      this->callback_execution_thread_status = false;
-      this->handle_exception(e);
-    }
-    this->callback_execution_thread_status = false;
+void SegwayRMP::executeCallback() {
+  SegwayStatus ss;
+  while (this->continuous) {
+    this->ss_queue.wait_and_pop(ss);
+    if (this->continuous) {
+      try {
+        this->status_callback(ss);
+      } catch (std::exception &e) {
+        this->handle_exception(e);
+      }// try callback
+    }// if continuous
+  }// while continuous
 }

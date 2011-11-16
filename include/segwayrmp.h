@@ -44,10 +44,11 @@
 #include <iostream>
 #include <stdio.h>
 #include <math.h>
+#include <queue>
 
 #include "rmp_io.h"
 
-#define SEGWAYRMP_SERIAL_SUPPORT 1
+#define SEGWAYRMP_SERIAL_SUPPORT 0
 #define SEGWAYRMP_FTD2XX_SUPPORT 1
 
 #if SEGWAYRMP_SERIAL_SUPPORT
@@ -58,7 +59,66 @@
 #include "rmp_ftd2xx.h"
 #endif
 
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
+
 namespace segwayrmp {
+
+/*!
+ * Defines the number of buffered SegwayStatus structures to be held.
+ */
+size_t MAX_SEGWAYSTATUS_QUEUE_SIZE = 100;
+
+// Based on: http://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html
+template<typename Data>
+class ConcurrentQueue
+{
+private:
+  std::queue<Data> the_queue;
+  mutable boost::mutex the_mutex;
+  boost::condition_variable the_condition_variable;
+public:
+  void push(Data const& data) {
+    boost::mutex::scoped_lock lock(the_mutex);
+    the_queue.push(data);
+    lock.unlock();
+    the_condition_variable.notify_one();
+  }
+
+  bool empty() const {
+    boost::mutex::scoped_lock lock(the_mutex);
+    return the_queue.empty();
+  }
+
+  bool try_pop(Data& popped_value) {
+    boost::mutex::scoped_lock lock(the_mutex);
+    if(the_queue.empty()) {
+      return false;
+    }
+    
+    popped_value=the_queue.front();
+    the_queue.pop();
+    return true;
+  }
+
+  void wait_and_pop(Data& popped_value) {
+    boost::mutex::scoped_lock lock(the_mutex);
+    while(the_queue.empty()) {
+        the_condition_variable.wait(lock);
+    }
+    
+    popped_value=the_queue.front();
+    the_queue.pop();
+  }
+  
+  size_t size() const {
+    return the_queue.size();
+  }
+  
+  void cancel() {
+    the_condition_variable.notify_one();
+  }
+};
 
 /*!
  * Defines the possible modes of communication for the Segway Interface.
@@ -600,7 +660,7 @@ private:
     void stopContinuousRead();
     void parsePacket(Packet &packet);
     bool _parsePacket(Packet &packet, SegwayStatus &_segway_status);
-    void executeCallback(SegwayStatus segway_status);
+    void executeCallback();
     void configureSegwayType();
     SegwayStatusCallback status_callback;
     DebugMsgCallback debug;
@@ -630,8 +690,8 @@ private:
     // SegwayStatus Callback Execution Thread
     boost::thread callback_execution_thread;
     
-    // SegwayStatus Callback Execution Thread Status
-    bool callback_execution_thread_status;
+    // SegwayStatus Concurrent Queue
+    ConcurrentQueue<SegwayStatus> ss_queue;
     
     double mps_to_counts, dps_to_counts, meters_to_counts, rev_to_counts, torque_to_counts;
     SegwayRMPType segway_type;
