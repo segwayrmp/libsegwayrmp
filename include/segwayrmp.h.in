@@ -59,15 +59,15 @@
 #include "rmp_ftd2xx.h"
 #endif
 
+/*!
+ * Defines the number of buffered SegwayStatus structures to be held.
+ */
+#define MAX_SEGWAYSTATUS_QUEUE_SIZE 100
+
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
 namespace segwayrmp {
-
-/*!
- * Defines the number of buffered SegwayStatus structures to be held.
- */
-size_t MAX_SEGWAYSTATUS_QUEUE_SIZE = 100;
 
 // Based on: http://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html
 template<typename Data>
