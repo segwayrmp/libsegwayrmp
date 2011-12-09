@@ -720,7 +720,7 @@ void SegwayRMP::parsePacket(Packet &packet) {
   //  complete "cycle" of information has been sent every
   //  time we get an 0x0407
   if (status_updated) {
-    if (this->ss_queue.size() < MAX_SEGWAYSTATUS_QUEUE_SIZE) {
+    if (this->ss_queue.size() == MAX_SEGWAYSTATUS_QUEUE_SIZE) {
       this->error("Falling behind, SegwayStatus Queue Full, skipping packet report...");
     } else {
       this->ss_queue.push(this->segway_status);
