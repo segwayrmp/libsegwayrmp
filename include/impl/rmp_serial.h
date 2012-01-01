@@ -39,7 +39,7 @@
 
 #include "rmp_io.h"
 
-#include "serial.h"
+#include "serial/serial.h"
 
 namespace segwayrmp {
 
