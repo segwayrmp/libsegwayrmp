@@ -2,7 +2,7 @@
 
 ## Documentation
 
-http://docs.williamjwoodall.com/libsegwayrmp/
+http://wjwwood.github.com/libsegwayrmp/0.1-rc2/
 
 ## Dependencies
 
