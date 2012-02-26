@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['read',['read',['../classsegwayrmp_1_1_r_m_p_i_o.html#a0494eaf797a6fa1530eaf73415ea2e81',1,'segwayrmp::RMPIO::read()'],['../classsegwayrmp_1_1_f_t_d2_x_x_r_m_p_i_o.html#a99ef8d4de50a43bd42dbd9a3ba27c269',1,'segwayrmp::FTD2XXRMPIO::read()'],['../classsegwayrmp_1_1_serial_r_m_p_i_o.html#a38784f08ff6c9deacfcb2a77c31de404',1,'segwayrmp::SerialRMPIO::read()']]],
+  ['readfailedexception',['ReadFailedException',['../classsegwayrmp_1_1_read_failed_exception.html',1,'segwayrmp']]],
+  ['readfailedexception',['ReadFailedException',['../classsegwayrmp_1_1_read_failed_exception.html#a0b3def73dd6ff2bb237cc8d84ff0fc28',1,'segwayrmp::ReadFailedException']]],
+  ['resetallintegrators',['resetAllIntegrators',['../classsegwayrmp_1_1_segway_r_m_p.html#a3112de09df36fe6b5f9e629f936d555a',1,'segwayrmp::SegwayRMP']]],
+  ['right_5fmotor_5ftorque',['right_motor_torque',['../classsegwayrmp_1_1_segway_status.html#abe550c659f2d7cbff492590fd286c530',1,'segwayrmp::SegwayStatus']]],
+  ['right_5fwheel_5fspeed',['right_wheel_speed',['../classsegwayrmp_1_1_segway_status.html#ab7fcaf3c6cd17a38647926ad5a05045d',1,'segwayrmp::SegwayStatus']]],
+  ['rmp100',['rmp100',['../namespacesegwayrmp.html#ab3ed045686afaaed95bcdaa1915aaa36a768ce5967edd9d5f2c00f034860db97b',1,'segwayrmp']]],
+  ['rmp200',['rmp200',['../namespacesegwayrmp.html#ab3ed045686afaaed95bcdaa1915aaa36a870d115a6123f8bf17fc3d48a223da53',1,'segwayrmp']]],
+  ['rmp400',['rmp400',['../namespacesegwayrmp.html#ab3ed045686afaaed95bcdaa1915aaa36a61df4c04edb33d51d9e4b008e73ca3f3',1,'segwayrmp']]],
+  ['rmp50',['rmp50',['../namespacesegwayrmp.html#ab3ed045686afaaed95bcdaa1915aaa36ab2bb900f590dcc57c8640f6cf44aeabd',1,'segwayrmp']]],
+  ['rmp_5fftd2xx_2ecpp',['rmp_ftd2xx.cpp',['../rmp__ftd2xx_8cpp.html',1,'']]],
+  ['rmp_5fftd2xx_2eh',['rmp_ftd2xx.h',['../rmp__ftd2xx_8h.html',1,'']]],
+  ['rmp_5fio_2ecpp',['rmp_io.cpp',['../rmp__io_8cpp.html',1,'']]],
+  ['rmp_5fio_2eh',['rmp_io.h',['../rmp__io_8h.html',1,'']]],
+  ['rmp_5fserial_2ecpp',['rmp_serial.cpp',['../rmp__serial_8cpp.html',1,'']]],
+  ['rmp_5fserial_2eh',['rmp_serial.h',['../rmp__serial_8h.html',1,'']]],
+  ['rmpio',['RMPIO',['../classsegwayrmp_1_1_r_m_p_i_o.html',1,'segwayrmp']]],
+  ['roll',['roll',['../classsegwayrmp_1_1_segway_status.html#a6fe41786eebdf84e2d70f1a23c0426b8',1,'segwayrmp::SegwayStatus']]],
+  ['roll_5frate',['roll_rate',['../classsegwayrmp_1_1_segway_status.html#a26c6c609c9b586149ccff3c00338b157',1,'segwayrmp::SegwayStatus']]]
+];
