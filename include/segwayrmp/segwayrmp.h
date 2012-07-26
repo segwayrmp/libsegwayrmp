@@ -42,6 +42,7 @@
 #include <exception>
 #include <sstream>
 #include <queue>
+#include <typeinfo>
 
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
@@ -68,7 +69,7 @@
     ClassName(const char * file, const int ln, \
               const char * msg = Message, const int id = -1) : id_(id) { \
       std::stringstream ss; \
-      ss << "ClassName occurred at line " << ln \
+      ss << #ClassName " occurred at line " << ln \
          << " of `" << file << "`: " << Prefix << msg; \
       what_ = ss.str().c_str(); \
     } \
