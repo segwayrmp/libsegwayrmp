@@ -31,15 +31,16 @@
  *
  * This provides a FTD2XX based usb implementation of the rmp_io interface.
  * 
- * This library depends on the FTD2XX driver: http://www.ftdichip.com/Drivers/D2XX.htm
+ * This library depends on the FTD2XX driver:
+ * http://www.ftdichip.com/Drivers/D2XX.htm
  */
 
 #ifndef RMP_FTD2XX_H
 #define RMP_FTD2XX_H
 
-#include "rmp_io.h"
+#include "segwayrmp/impl/rmp_io.h"
 
-#include "ftd2xx.h"
+#include "segwayrmp/ftd2xx.h"
 
 namespace segwayrmp {
 

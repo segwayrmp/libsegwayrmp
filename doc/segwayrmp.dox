@@ -1,0 +1,53 @@
+/*!
+\mainpage segwayrmp
+
+\author William Woodall <wjwwood@gmail.com>
+
+\section what_is What is this page?
+This is the landing page of your auto-generated documentation.
+
+\section getting_started Getting Started
+
+Ready to jump in?
+- This is how you do bullets
+- This is how you reference class documentation: \ref segwayrmp::SegwayRMP
+
+\section install Installation
+
+\subsection Dependencies
+
+- CMake:
+ - CMake is required for building the system and can be located here: http://www.cmake.org/
+
+\subsection building Compiling
+
+Once you have gathered the dependencies, you need to checkout the software from github.com: 
+
+<pre>
+    git clone < REPLACE_ME with your url >
+</pre>
+
+Once you have checked out the source code from github.com you can enter the directory and build the software.
+
+<pre>
+    cd segwayrmp
+    make
+    make test # (optional) builds the example and tests, and runs the tests.
+    make doc  # (optional) builds _this_ documentation.
+</pre>
+
+\subsection installing Installing
+
+To install simply:
+
+<pre>
+    sudo make install
+</pre>
+
+To uninstall simply:
+
+<pre>
+    sudo make uninstall
+</pre>
+
+ */

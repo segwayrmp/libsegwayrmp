@@ -1,0 +1,26 @@
+{
+	"folders":
+	[
+		{
+			"path": "/Users/william/devel/tmp/segwayrmp"
+		},
+		{
+			"path": "/Users/william/devel/segwayrmp_ws/libsegwayrmp"
+		},
+		{
+			"path": "/Users/william/devel/serial"
+		}
+	],
+	"settings":
+	{
+		"sublimeclang_options":
+		[
+			"/usr/include",
+			"/usr/local/include",
+			"-I${folder:${project_path:segway.sublime-project}}/include",
+			"-I${folder:${project_path:segway.sublime-project}}/ftd2xx/include",
+			"-DSEGWAYRMP_USE_SERIAL",
+			"-I/Users/william/devel/serial/include"
+		]
+	}
+}

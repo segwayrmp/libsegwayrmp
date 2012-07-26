@@ -1,0 +1,875 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"SegwayRM",
+				"SegwayRMP_Impl"
+			],
+			[
+				"con",
+				"configuration	std::string"
+			],
+			[
+				"conf",
+				"config_type	int"
+			],
+			[
+				"Xbow",
+				"Xbow440Data	struct"
+			],
+			[
+				"catk",
+				"catkin_FOUND"
+			],
+			[
+				"projec",
+				"project_name"
+			],
+			[
+				"proj",
+				"project_name"
+			],
+			[
+				"RO",
+				"ROS_SUPPORT"
+			],
+			[
+				"templ",
+				"template_dir"
+			],
+			[
+				"get",
+				"get_module_path"
+			],
+			[
+				"walk",
+				"walk_module_template"
+			],
+			[
+				"hook",
+				"hooks_dir"
+			],
+			[
+				"mod",
+				"modules"
+			],
+			[
+				"ROS",
+				"ROS_FOUND"
+			],
+			[
+				"GT",
+				"GTest_FOUND"
+			],
+			[
+				"project",
+				"project_name_caps"
+			],
+			[
+				"pr",
+				"project_name"
+			],
+			[
+				"pro",
+				"project_name_caps"
+			],
+			[
+				"fil",
+				"file_name_sub"
+			],
+			[
+				"make",
+				"makedirs  (function)"
+			],
+			[
+				"fi",
+				"file_contents"
+			],
+			[
+				"file",
+				"file_name"
+			],
+			[
+				"prj",
+				"project_name"
+			],
+			[
+				"proje",
+				"project_name"
+			],
+			[
+				"out",
+				"output_dir"
+			],
+			[
+				"o",
+				"option"
+			],
+			[
+				"opt",
+				"options"
+			],
+			[
+				"sh",
+				"showMessage"
+			],
+			[
+				"val",
+				"values"
+			],
+			[
+				"Timeout",
+				"Timeout	"
+			],
+			[
+				"getParam",
+				"getParam(const std::string &key, std::string &s) const	bool"
+			],
+			[
+				"UBL",
+				"UBLOX_LINK_LIBS"
+			],
+			[
+				"Ser",
+				"SerialExecption	"
+			],
+			[
+				"baudr",
+				"baudrate_"
+			],
+			[
+				"dcb",
+				"dcbSerialParams"
+			],
+			[
+				"byte",
+				"bytes_written	size_t"
+			],
+			[
+				"write",
+				"write_timeout_multiplier	int32_t"
+			],
+			[
+				"read",
+				"read_timeout_multiplier"
+			],
+			[
+				"read_",
+				"read_timeout_multiplier"
+			],
+			[
+				"inter",
+				"inter_byte_timeout"
+			],
+			[
+				"write_",
+				"write_timeout_constant"
+			],
+			[
+				"string",
+				"stringstream"
+			],
+			[
+				"Seri",
+				"SerialExecption"
+			],
+			[
+				"tour",
+				"toupper(int _c)	int"
+			],
+			[
+				"rotat",
+				"SceneObject::rotateTo(GLfloat roll, GLfloat pitch, GLfloat yaw)	void"
+			],
+			[
+				"tou",
+				"touring_index	size_t"
+			],
+			[
+				"person",
+				"person_mbb	Model::CollisionBox"
+			],
+			[
+				"SE",
+				"SE	Model::CollisionBox"
+			],
+			[
+				"m",
+				"mbb	Model::CollisionBox"
+			],
+			[
+				"glVer",
+				"glVertex2fv(const GLfloat *v)	void"
+			],
+			[
+				"di",
+				"distance	GLfloat"
+			],
+			[
+				"the",
+				"their_position	GLfloat *"
+			],
+			[
+				"their",
+				"their_obj_it	vector<Model::Object>::iterator"
+			],
+			[
+				"my",
+				"my_obj_it	vector<Model::Object>::iterator"
+			],
+			[
+				"my_mod",
+				"my_model_it	vector<Model>::iterator"
+			],
+			[
+				"thei",
+				"their_model_it	vector<Model>::iterator"
+			],
+			[
+				"iterator",
+				"assign(_InputIterator __first, _InputIterator __last)	void"
+			],
+			[
+				"lh",
+				"lhs_mbb	Model::CollisionBox"
+			],
+			[
+				"cal",
+				"calculateMBB(Model::Object &obj)	Model::CollisionBox"
+			],
+			[
+				"Col",
+				"CollisionBox	"
+			],
+			[
+				"spo",
+				"spotlight	LightingStyle"
+			],
+			[
+				"main",
+				"main_camera	Camera"
+			],
+			[
+				"pers",
+				"person	Person *"
+			],
+			[
+				"glro",
+				"glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)	void"
+			],
+			[
+				"glTran",
+				"glTranslatef(GLfloat x, GLfloat y, GLfloat z)	void"
+			],
+			[
+				"she",
+				"shelby_model	string"
+			],
+			[
+				"loa",
+				"loaded_	bool"
+			],
+			[
+				"ena",
+				"enabled_	bool"
+			],
+			[
+				"sp",
+				"specular(GLfloat r, GLfloat g, GLfloat b, GLfloat a)	void"
+			],
+			[
+				"en",
+				"direction(GLfloat x, GLfloat y, GLfloat z)	void"
+			],
+			[
+				"spot",
+				"spot_light	Light"
+			],
+			[
+				"GL_NOR",
+				"GL_NORMALIZE	"
+			],
+			[
+				"att",
+				"attenuation_q_	GLfloat"
+			],
+			[
+				"atte",
+				"attenuation_c_	GLfloat"
+			],
+			[
+				"glPop",
+				"glPopMatrix()	void"
+			],
+			[
+				"appl",
+				"apply_()	void"
+			],
+			[
+				"no_l",
+				"no_lights_left	const size_t"
+			],
+			[
+				"ligh",
+				"lights_left	size_t"
+			],
+			[
+				"do",
+				"do_normals	bool"
+			],
+			[
+				"back_in",
+				"back_inserter(_Container &__x)	back_insert_iterator<_Container>"
+			],
+			[
+				"istr",
+				"istream_iterator<typename _Tp>	"
+			],
+			[
+				"is",
+				"istringstream	"
+			],
+			[
+				"math",
+				"matches	size_t"
+			],
+			[
+				"curr",
+				"current_object	Model::Object"
+			],
+			[
+				"matc",
+				"matches2	size_t"
+			],
+			[
+				"QwtPlot",
+				"QwtPlotZoomer"
+			],
+			[
+				"__init",
+				"__initZooming"
+			],
+			[
+				"plot_coi",
+				"plot_coil2"
+			],
+			[
+				"plo",
+				"plot_coil1"
+			],
+			[
+				"plot_co",
+				"plot_coil2"
+			],
+			[
+				"QwtPl",
+				"QwtPlotCurve"
+			],
+			[
+				"trail",
+				"trailer_plotcurve"
+			],
+			[
+				"pl",
+				"plot_coil1"
+			],
+			[
+				"plot",
+				"plot_coil1"
+			],
+			[
+				"open",
+				"open_button"
+			],
+			[
+				"plotcoi",
+				"plot_coil1"
+			],
+			[
+				"EM",
+				"EM61MK2Log"
+			],
+			[
+				"pa",
+				"path_file_name"
+			],
+			[
+				"head",
+				"headings"
+			],
+			[
+				"eas",
+				"eastings"
+			],
+			[
+				"north",
+				"northings"
+			],
+			[
+				"las",
+				"last_east"
+			],
+			[
+				"odom",
+				"odom"
+			],
+			[
+				"logs",
+				"logs_data"
+			],
+			[
+				"plot_",
+				"plot_em61mk2logs"
+			],
+			[
+				"Em61",
+				"EM61MK2Log"
+			],
+			[
+				"sib",
+				"sibling_file_name"
+			],
+			[
+				"si",
+				"sibling_file_name"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "include/segwayrmp/segwayrmp.h",
+			"settings":
+			{
+				"buffer_size": 21073,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/segwayrmp.cc",
+			"settings":
+			{
+				"buffer_size": 27239,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/Python/Python.sublime-build",
+	"command_palette":
+	{
+		"height": 167.0,
+		"selected_items":
+		[
+			[
+				"convert",
+				"Indentation: Convert to Spaces"
+			],
+			[
+				"conver",
+				"Indentation: Convert to Spaces"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"convert sp",
+				"Indentation: Convert to Spaces"
+			],
+			[
+				"Package Control: remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"late",
+				"LaTeXTools: View PDF"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/william/devel/templates/base/LICENSE",
+		"/Users/william/devel/templates/generate_project.py",
+		"/Users/william/devel/templates/licenses/bsd.txt",
+		"/Users/william/devel/segwayrmp_ws/libsegwayrmp/Findsegwayrmp.cmake",
+		"/Users/william/devel/segwayrmp_ws/segway_rmp/libftd2xx/.gitignore",
+		"/Users/william/devel/segwayrmp_ws/segway_rmp/segway_rmp/serial_segway_rmp/Makefile",
+		"/Users/william/devel/segwayrmp_ws/segway_rmp/segway_rmp/libsegwayrmp/Makefile",
+		"/Users/william/devel/segwayrmp_ws/segway_rmp/segway_rmp/libftd2xx/Makefile",
+		"/Users/william/devel/templates/modules/library_extras/hooks/header_hook_2.h",
+		"/Users/william/Library/Application Support/Sublime Text 2/Packages/SublimeClang/SublimeClang.sublime-settings",
+		"/Users/william/devel/templates/templates.sublime-project",
+		"/Users/william/devel/templates/modules/library_extras/hooks/header_hook_1.h",
+		"/Users/william/devel/templates/base/cmake/{project_name}_settings.cmake",
+		"/Users/william/devel/templates/modules/ros/template/cmake/{project_name}_ros.cmake",
+		"/Users/william/devel/templates/base/CMakeLists.txt",
+		"/Users/william/devel/templates/modules/ros/hooks/cmake_include_hook.cmake",
+		"/Users/william/devel/catkin/cmake/all.cmake",
+		"/Users/william/devel/catkin/cmake/catkin_project.cmake",
+		"/Users/william/devel/templates/base/cmake/{project_name}_targets.cmake",
+		"/Users/william/devel/templates/base/cmake/{project_name}_examples.cmake",
+		"/Users/william/devel/templates/base/Find{project_name}.cmake",
+		"/Users/william/devel/templates/modules/ros/template/stack.xml",
+		"/Users/william/devel/templates/modules/ros/hooks/cmake_post_library_hook.cmake",
+		"/Users/william/devel/templates/modules/ros/template/src/{project_name}_node.cc",
+		"/Users/william/devel/templates/modules/ros/hooks/rosinstall_hook.rosinstall",
+		"/Users/william/devel/templates/base/examples/{project_name}_example.cc",
+		"/Users/william/devel/templates/modules/ros/hooks/include_hook.txt",
+		"/Users/william/devel/templates/modules/ros/template/{project_name}.rosinstall",
+		"/Users/william/devel/templates/base/doc/{project_name}.dox",
+		"/Users/william/devel/templates/base/doc/Doxyfile",
+		"/Users/william/devel/templates/README.md",
+		"/Users/william/devel/templates/variable_list.txt",
+		"/Users/william/devel/templates/base/cmake/{project_name}_tests.cmake",
+		"/Users/william/devel/templates/base/Makefile",
+		"/Users/william/devel/templates/base/include/{project_name}/{project_name}.h",
+		"/Users/william/devel/templates/base/doc/Doxygen",
+		"/Users/william/devel/templates/base/tests/{project_name}_tests.cc",
+		"/Users/william/devel/templates/base/src/{project_name}.cc",
+		"/Users/william/devel/templates/licenses/gpl_v3.txt",
+		"/Users/william/devel/templates/licenses/mit.txt",
+		"/Users/william/devel/novatel_ws/novatel_ws.sublime-project",
+		"/Users/william/devel/pendulum/pendulum_control.py",
+		"/Users/william/devel/pendulum/pendulum/connectdialog.py",
+		"/Users/william/devel/thesis/thesis.tex",
+		"/Users/william/Desktop/atrv_todo.txt",
+		"/Users/william/devel/thesis/references.bib",
+		"/Users/william/Downloads/ion_plans_paper/ion_plans.tex",
+		"/Users/william/devel/thesis/thesis.bbl",
+		"/Users/william/devel/thesis/thesis.bbl [6]",
+		"/Users/william/Downloads/ion_plans_paper/citations.bib",
+		"/Users/william/Downloads/au_style_files/ausample.nls",
+		"/Users/william/devel/3d_teleop_ws/3d_teleop/teleop_server/src/teleop_server.cpp",
+		"/Users/william/devel/3d_teleop_ws/3d_teleop_ws.sublime-project",
+		"/Users/william/devel/atrv_ws/serial/serial.sublime-project",
+		"/Volumes/william/devel/fuerte/stacks/openni_launch/launch/includes/device.launch",
+		"/Volumes/william/devel/atrv_ws/atrv_ws.sublime-project",
+		"/Volumes/william/devel/atrv_ws/mdc2250/src/mdc2250.cc",
+		"/Volumes/william/devel/atrv_ws/testing/serial_test.cc",
+		"/Volumes/william/devel/atrv_ws/serial/include/serial/serial.h",
+		"/Volumes/william/devel/atrv_ws/serial/src/serial.cc",
+		"/Volumes/william/devel/atrv_ws/serial/src/impl/unix.cc",
+		"/Volumes/william/devel/atrv_ws/serial_utils/src/serial_listener.cc",
+		"/Users/william/generate_ros_includes.py",
+		"/Volumes/william/devel/atrv_ws/serial/serial.sublime-project",
+		"/Volumes/william/devel/atrv_ws/atrv_ws.sublime-workspace",
+		"/Volumes/william/devel/atrv_ws/gavlab_atrv/gavlab_atrv_launch/launch/hardware.launch",
+		"/Volumes/william/devel/atrv_ws/gavlab_atrv/gavlab_atrv_launch/launch/sensors.launch",
+		"/Volumes/william/devel/atrv_ws/gavlab_atrv/gavlab_atrv_launch/launch/kinect.launch",
+		"/Volumes/william/devel/atrv_ws/gavlab_atrv/gavlab_atrv_launch/launch/transforms.xml",
+		"/Volumes/gavlab/devel/atrv_ws/mdc2250/src/mdc2250.cc",
+		"/Users/william/devel/atrv_ws/gavlab_atrv/gavlab_atrv_description/launch/display.launch",
+		"/Users/william/devel/atrv_ws/gavlab_atrv/gavlab_atrv_description/urdf/atrv.urdf.xacro",
+		"/Users/william/devel/ublox_ws/ublox/manifest.xml",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gnss_msgs/manifest.xml",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gnss_msgs/Makefile",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gnss_msgs/mainpage.dox",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gnss_msgs/CMakeLists.txt",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gps_msgs/msg/Ephemeris.msg",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gps_msgs/msg/GNSSRaw.msg",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gps_msgs/msg/GNSSRawSat.msg",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gps_msgs/msg/GPSRawSat.msg",
+		"/Users/william/devel/ublox_ws/gavlab_msgs/gps_msgs/msg/GPSRaw.msg",
+		"/Users/william/devel/ublox_ws/ublox/src/ublox.cpp",
+		"/Users/william/devel/ublox_ws/ublox/include/ublox/ublox_structures.h",
+		"/Users/william/devel/ublox_ws/ublox_ws.sublime-project",
+		"/Users/william/devel/ublox_ws/serial/serial.sublime-project",
+		"/Users/william/devel/ublox_ws/ublox/CMakeLists.txt",
+		"/Users/william/devel/ublox_ws/ublox/examples/simple.cc",
+		"/Users/william/devel/ublox_ws/ublox/ublox.sublime-project",
+		"/Users/william/devel/ublox_ws/ublox/ublox.rosinstall",
+		"/Users/william/devel/ublox/CMakeLists.txt",
+		"/Users/william/devel/ublox/src/ublox_node.cc",
+		"/Users/william/devel/ublox/Makefile",
+		"/Users/william/devel/ublox/include/ublox/ublox.h",
+		"/Users/william/devel/ublox/src/ublox.cpp",
+		"/Users/william/devel/ublox/examples/ublox_example.cpp",
+		"/Users/william/devel/ublox/include/ublox/ublox_structures.h",
+		"/Users/william/devel/ublox/ublox.sublime-project",
+		"/Users/william/devel/serial/doc/Doxyfile",
+		"/Users/william/devel/serial/include/serial/serial.h",
+		"/Users/william/devel/serial/serial.sublime-project",
+		"/Users/william/devel/serial/serial_ros.cmake",
+		"/Users/william/devel/serial/README.md",
+		"/Users/william/devel/serial/manifest.xml",
+		"/Users/william/devel/serial/Findserial.cmake",
+		"/Volumes/homes/devel/serial/src/impl/unix.cc",
+		"/Users/william/devel/serial/src/impl/unix.cc",
+		"/Volumes/william/devel/serial/serial.sublime-project",
+		"/Users/william/devel/serial/src/serial.cc",
+		"/Users/william/devel/serial/serial.cmake",
+		"/Users/william/devel/serial/serial.makefile",
+		"/Users/william/Library/Application Support/Sublime Text 2/Packages/User/SublimeClang.sublime-settings",
+		"/Users/william/devel/serial/include/serial/v8stdint.h",
+		"/Users/william/devel/serial/include/serial/impl/win.h",
+		"/Users/william/devel/serial/src/impl/win.cc",
+		"/Users/william/devel/serial/include/serial/impl/unix.h",
+		"/Users/william/devel/serial/src/impl/windows.cc",
+		"/Users/william/devel/serial/doc/html/serial_8h.html",
+		"/Users/william/devel/serial/doc/html/unix_8h.html",
+		"/Users/william/devel/serial/doc/html/windows_8h.html",
+		"/Users/william/devel/serial/include/serial/impl/windows.h",
+		"/Users/william/Library/Application Support/Sublime Text 2/Packages/Terminal/Default (OSX).sublime-keymap",
+		"/Users/william/Library/Application Support/Sublime Text 2/Packages/SublimeAStyleFormatter/SublimeAStyleFormatter.sublime-settings",
+		"/Users/william/Library/Application Support/Sublime Text 2/Packages/SublimeClang/Default.sublime-keymap",
+		"/Users/william/Library/Application Support/Sublime Text 2/Packages/SublimeAStyleFormatter/Default (OSX).sublime-keymap",
+		"/Users/william/devel/automow_ws/au_automow_common/automow_planning/tests/test_path_planner.py",
+		"/Users/william/devel/automow_ws/au_automow_common/automow_planning/tests/test_coverage_planner.py",
+		"/Users/william/devel/automow_ws/au_automow_common/automow_planning/tests/test_costmap.py"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"<open files>",
+			"",
+			"<open files>",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"serial",
+			"inclu",
+			"\\textunderscore{}",
+			"\\subsection{",
+			"\\section{",
+			"chap:latency_results",
+			"bandwi",
+			"\\alpha",
+			"\\psi",
+			"\\alpha",
+			"\\ref{eq:",
+			"TODO",
+			"ROS",
+			"[here",
+			"6.5",
+			"[here",
+			"here",
+			"[h]",
+			"kinect",
+			"opt/ros",
+			"timeout",
+			"xbow",
+			"Input",
+			"<<<",
+			"flowcon",
+			"xonxoff_",
+			"rtscts_",
+			"#ifdef B",
+			"baud = B",
+			"write",
+			"char",
+			"unsigned char",
+			"char",
+			"long",
+			"2011",
+			"  *",
+			"cts",
+			" ",
+			"o ",
+			"Cube_Cube.001",
+			"min[2]",
+			"min[1]",
+			"max[2]",
+			"max[1]",
+			"max[0]",
+			"min[0]",
+			"window_width",
+			"800",
+			"•",
+			"Cube",
+			"expected 1.",
+			"counter",
+			"go",
+			"setZoomerMousePattern",
+			"updateNode",
+			"compute",
+			"insertS"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"_",
+			"## ",
+			"#",
+			"Volumes/william/devel",
+			"#ifdef CBR_",
+			"dcbSerialParams.BaudRate = CBR_",
+			"2012",
+			"   *",
+			", ",
+			"min.z",
+			"min.y",
+			"max.z",
+			"max.y",
+			"max.x",
+			"min.x",
+			"*"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "include/segwayrmp/segwayrmp.h",
+					"settings":
+					{
+						"buffer_size": 21073,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								20402,
+								20402
+							]
+						],
+						"settings":
+						{
+							"spell_check": false,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 9335.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/segwayrmp.cc",
+					"settings":
+					{
+						"buffer_size": 27239,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								473,
+								473
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.clang":
+	{
+		"height": 100.0
+	},
+	"output.exec":
+	{
+		"height": 130.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 270.0,
+	"status_bar_visible": true
+}
