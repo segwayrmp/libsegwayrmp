@@ -28,6 +28,9 @@ include(cmake/segwayrmp_serial.cmake)
 # Configure FTD2XX support
 include(cmake/segwayrmp_ftd2xx.cmake)
 
+# Configure Graphical User Interface
+include(cmake/segwayrmp_gui.cmake)
+
 ## Build the segwayrmp project
 
 # Compile the Library
