@@ -716,6 +716,10 @@ public:
   void
   setExceptionCallback(ExceptionCallback callback);
 private:
+  // Disable Copy Constructor
+  void operator=(const SegwayRMP &);
+  const SegwayRMP & operator=(SegwayRMP);
+
   // Interface implementation (pimpl idiom)
   RMPIO * rmp_io_;
 
