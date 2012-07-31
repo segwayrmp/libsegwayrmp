@@ -100,6 +100,7 @@ void MainWindow::commandPoll() {
         try {
             double lv_s = ui->lv_scale_slider->value() / 100.0f;
             double av_s = ui->av_scale_slider->value() / 100.0f;
+            av_s *= -1.0; // Invert turning for segway
             this->rmp_->moveCounts((short int)(lv*1176*lv_s), (short int)(av*1024*av_s));
         } catch (const std::exception &e) {
             qDebug() << "Error commanding base: " << e.what();
