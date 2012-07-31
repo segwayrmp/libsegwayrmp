@@ -54,6 +54,8 @@ typedef enum {
     by_none            = 3  /*!< Means it hasn't been set yet. */
 } ConfigurationType;
 
+std::vector<FT_DEVICE_LIST_INFO_NODE> enumerateUSBDevices();
+
 class FTD2XXRMPIO : public RMPIO {
 public:
     /*!
@@ -116,11 +118,10 @@ public:
     void configureUSBByIndex(unsigned int device_index, int baudrate);
     
 private:
-    void enumerateUSBDevices();
+    std::vector<FT_DEVICE_LIST_INFO_NODE> enumerateUSBDevices_();
     void connectBySerial();
     void connectByDescription();
     void connectByIndex();
-    std::string getErrorMessageByFT_STATUS(FT_STATUS result, std::string what);
     
     bool configured;
     
