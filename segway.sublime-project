@@ -15,8 +15,8 @@
 	{
 		"sublimeclang_options":
 		[
-			"/usr/include",
-			"/usr/local/include",
+			"-I/usr/include",
+			"-I/usr/local/include",
 			"-I${folder:${project_path:segway.sublime-project}}/include",
 			"-I${folder:${project_path:segway.sublime-project}}/ftd2xx/include",
 			"-DSEGWAYRMP_USE_SERIAL",
