@@ -5,17 +5,29 @@
 
 #include <QtCore/QtConcurrentRun>
 #include <QtGui/QErrorMessage>
+#include <QtCore/QTimer>
+
+#define JOY_DEADBAND 3200
+#define JOY_MAX_VALUE 32768
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     connected_(false),
     interface_type_(segwayrmp::usb),
-    rmp_type_(segwayrmp::rmp200)
+    rmp_type_(segwayrmp::rmp200),
+    joystick_(0),
+    running_(true)
 {
+    // Init UI
     ui->setupUi(this);
     this->usb_devices_.push_back("No devices detected.");
     this->updateUSBList();
+    // Init SDL
+    SDL_Init(SDL_INIT_JOYSTICK);
+    SDL_JoystickEventState(SDL_ENABLE);
+    this->updateJoysticks();
+    QTimer * timer = new QTimer(this);
 
     // Connection related signals and slots
     connect(ui->connect_button, SIGNAL(clicked()), this, SLOT(onConnectClicked()));
@@ -42,11 +54,104 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->balance_lockout_button, SIGNAL(clicked()), this, SLOT(onBalanceLockout()));
     connect(ui->balance_unlock_button, SIGNAL(clicked()), this, SLOT(onBalanceUnlock()));
     connect(ui->send_config_button, SIGNAL(clicked()), this, SLOT(onSendConfig()));
+
+    // joystick stuff
+    connect(ui->joy_list_cb, SIGNAL(activated(int)), this, SLOT(onJoystickChanged(int)));
+    connect(timer, SIGNAL(timeout()), this, SLOT(commandPoll()));
+    timer->start(1000.0/25.0);
+    this->onJoystickChanged(0);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent * e) {
+    this->running_ = false;
+}
+
+void MainWindow::commandPoll() {
+    this->joy_mutex_.lock();
+    // If the joystick isn't there do nothing
+    if (!this->joystick_) {
+        this->joy_mutex_.unlock();
+        return;
+    }
+    SDL_JoystickUpdate();
+    int lv_i = SDL_JoystickGetAxis(this->joystick_, ui->lv_axis_cb->currentIndex());
+    int av_i = SDL_JoystickGetAxis(this->joystick_, ui->av_axis_cb->currentIndex());
+    this->joy_mutex_.unlock();
+    // Deadband
+    if (lv_i > -JOY_DEADBAND && lv_i < JOY_DEADBAND) {
+        lv_i = 0;
+    }
+    if (av_i > -JOY_DEADBAND && av_i < JOY_DEADBAND) {
+        av_i = 0;
+    }
+    // Normalize
+    double lv = float(lv_i)/float(JOY_MAX_VALUE);
+    lv *= -1; // Invert X
+    double av = float(av_i)/float(JOY_MAX_VALUE);
+    // Show in progress bars
+    ui->lv_pb->setValue(int(lv*100));
+    ui->av_pb->setValue(int(av*100));
+    if (ui->send_chb->checkState() == Qt::Checked && this->rmp_) {
+        try {
+            double lv_s = ui->lv_scale_slider->value() / 100.0f;
+            double av_s = ui->av_scale_slider->value() / 100.0f;
+            this->rmp_->moveCounts((short int)(lv*1176*lv_s), (short int)(av*1024*av_s));
+        } catch (const std::exception &e) {
+            qDebug() << "Error commanding base: " << e.what();
+        }
+    }
+}
+
+void MainWindow::onJoystickChanged(int index) {
+    this->joy_mutex_.lock();
+    if (this->joystick_) {
+        SDL_JoystickClose(this->joystick_);
+        this->joystick_ = 0;
+    }
+    if (SDL_NumJoysticks() > 0) {
+        this->joystick_ = SDL_JoystickOpen(index);
+        size_t num_axes = SDL_JoystickNumAxes(this->joystick_);
+        ui->lv_axis_cb->clear();
+        ui->lv_axis_cb->setEnabled(true);
+        ui->av_axis_cb->clear();
+        ui->av_axis_cb->setEnabled(true);
+        ui->send_chb->setEnabled(true);
+        if (num_axes == 0) {
+            ui->lv_axis_cb->addItem("No axes.");
+            ui->av_axis_cb->addItem("No axes.");
+        }
+        for (size_t i = 0; i < num_axes; ++i) {
+            ui->lv_axis_cb->addItem(QString("Axis %1").arg(QString::number(i)));
+            ui->av_axis_cb->addItem(QString("Axis %1").arg(QString::number(i)));
+        }
+        if (num_axes >= 2) {
+            ui->lv_axis_cb->setCurrentIndex(1);
+            ui->av_axis_cb->setCurrentIndex(0);
+        }
+    } else {
+        ui->lv_axis_cb->clear();
+        ui->lv_axis_cb->setEnabled(false);
+        ui->av_axis_cb->clear();
+        ui->av_axis_cb->setEnabled(false);
+        ui->send_chb->setEnabled(false);
+    }
+    this->joy_mutex_.unlock();
+}
+
+void MainWindow::updateJoysticks() {
+    size_t num_joysticks = SDL_NumJoysticks();
+    ui->joy_list_cb->clear();
+    if (num_joysticks == 0) {
+        ui->joy_list_cb->addItem("No Joysticks Detected.");
+    }
+    for (size_t i = 0; i < num_joysticks; ++i) {
+        ui->joy_list_cb->addItem(QString::fromAscii(SDL_JoystickName(i)));
+    }
 }
 
 void MainWindow::onResetIntegrators() {

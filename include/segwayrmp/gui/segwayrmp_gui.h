@@ -2,6 +2,9 @@
 #define SEGWAYRMP_GUI_H
 
 #include <QtGui/QMainWindow>
+#include <QtCore/QMutex>
+
+#include <SDL/SDL.h>
 
 #include <segwayrmp/segwayrmp.h>
 
@@ -19,6 +22,10 @@ public slots:
     void rmpTypeChanged(QString);
     void USBListUpdated();
     void updateUSBList();
+
+    void updateJoysticks();
+    void onJoystickChanged(int);
+    void commandPoll();
 
     void handleSegwayLog(QString);
     void handleSegwayStatus(QString);
@@ -51,8 +58,14 @@ private:
     segwayrmp::SegwayRMP * rmp_;
     segwayrmp::InterfaceType interface_type_;
     segwayrmp::SegwayRMPType rmp_type_;
+    SDL_Joystick * joystick_;
+    QMutex joy_mutex_;
+    bool running_;
 
     void updateUSBList_();
+
+protected:
+    void closeEvent(QCloseEvent*);
 };
 
 #endif // SEGWAYRMP_GUI_H
