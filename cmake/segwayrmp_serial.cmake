@@ -24,6 +24,8 @@ if(SEGWAYRMP_USE_SERIAL)
       set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
       # set the default path for built libraries to the "lib" directory
       set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+      # We found it, set true
+      set(SEGWAYRMP_USE_SERIAL TRUE)
     else(DEFINED ROS_ROOT)
       # Could not find serial either through find_package or ROS
       message("--")
@@ -33,7 +35,7 @@ if(SEGWAYRMP_USE_SERIAL)
   endif(serial_FOUND)
 
   if(SEGWAYRMP_USE_SERIAL)
-    message("-- Building with serial support")
+    message("-- Building SegwayRMP with serial support")
     list(APPEND SEGWAYRMP_SRCS src/impl/rmp_serial.cc)
     add_definitions(-DSEGWAYRMP_USE_SERIAL)
   endif(SEGWAYRMP_USE_SERIAL)

@@ -1,7 +1,7 @@
 find_package(Qt4 QUIET)
 
 if(QT4_FOUND)
-  message("-- SegwayRMP GUI will be built")
+  message("-- Building SegwayRMP GUI")
   include(${QT_USE_FILE})
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
   add_definitions(${QT_DEFINITIONS})

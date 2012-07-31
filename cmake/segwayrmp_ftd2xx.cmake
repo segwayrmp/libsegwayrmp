@@ -20,13 +20,13 @@ if(UNIX)
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # If Mac OS X
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    message("-- **")
-    message("-- **")
+    message("")
+    message("-- **********************************************************")
     message("-- On OS X the ftd2xx library needs to be installed before")
     message("-- running applications:")
     message("-- http://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.1.12.dmg")
-    message("-- **")
-    message("-- **")
+    message("-- **********************************************************")
+    message("")
     list(APPEND SEGWAYRMP_LINK_LIBS
       ${PROJECT_SOURCE_DIR}/ftd2xx/osx/libftd2xx.1.1.12.dylib
     )
