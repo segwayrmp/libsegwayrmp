@@ -362,6 +362,33 @@ void SegwayRMP::shutdown()
   }
 }
 
+void SegwayRMP::moveCounts(short int linear_counts, short int angular_counts)
+{
+  // Ensure we are connected
+  if (!this->connected_)
+    RMP_THROW_MSG(MoveFailedException, "Not Connected.");
+  try {
+    short int lc = linear_counts;
+    short int ac = angular_counts;
+    Packet packet;
+
+    packet.id = 0x0413;
+
+    packet.data[0] = (unsigned char)((lc & 0xFF00) >> 8);
+    packet.data[1] = (unsigned char)(lc & 0x00FF);
+    packet.data[2] = (unsigned char)((ac & 0xFF00) >> 8);
+    packet.data[3] = (unsigned char)(ac & 0x00FF);
+    packet.data[4] = 0x00;
+    packet.data[5] = 0x00;
+    packet.data[6] = 0x00;
+    packet.data[7] = 0x00;
+
+    this->rmp_io_->sendPacket(packet);
+  } catch (std::exception &e) {
+    RMP_THROW_MSG(MoveFailedException, e.what());
+  }
+}
+
 void SegwayRMP::move(float linear_velocity, float angular_velocity)
 {
   // Ensure we are connected

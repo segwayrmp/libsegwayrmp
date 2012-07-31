@@ -410,7 +410,19 @@ public:
   shutdown();
 
   /*!
-   * This command moves the base.
+   * This command moves the base at a given linear and angular count.
+   *
+   * \param linear_counts Forward/Reverse effort, in range [-1176, 1176].
+   *  Which maps approximately to [-8, 8] mph (assuming a max velocity
+   *  scalar of 1.0)
+   * \param angular_counts Angular effort, in range [-1024, 1024].
+   */
+  void
+  moveCounts(short int linear_counts, short int angular_counts);
+
+  /*!
+   * This command moves the base at a given linear and angular velocity.
+   * This assumes the max velocity scalar is set to 1.0.
    * 
    * \param linear_velocity Forward/Reverse desired velocity of the vehicle
    *  in m/s.
