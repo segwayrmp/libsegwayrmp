@@ -66,6 +66,7 @@ struct Packet {
 */
 class RMPIO {
 public:
+    RMPIO() : canceled(false) {}
   /*!
    * Abstract Connect Function, implemented by subclass.
    */
@@ -114,12 +115,18 @@ public:
    * \return bool weather or not the underlying I/O interface is connected.
    */
   bool isConnected() {return this->connected;}
+
+  /*!
+   * Cancels any currently being processed packets, should be called at shudown.
+   */
+  void cancel() {this->canceled = true;}
   
 protected:
   void fillBuffer();
   unsigned char computeChecksum(unsigned char* usb_packet);
   
   bool connected;
+  bool canceled;
   
   std::vector<unsigned char> data_buffer;
 };

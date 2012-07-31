@@ -757,6 +757,7 @@ void SegwayRMP::StartReadingContinuously_() {
 void SegwayRMP::StopReadingContinuously_()
 {
   this->continuously_reading_ = false;
+  this->rmp_io_->cancel();
   this->read_thread_.join();
   this->ss_queue_.cancel();
   this->callback_execution_thread_.join();

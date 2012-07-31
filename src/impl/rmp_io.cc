@@ -23,7 +23,7 @@ void RMPIO::getPacket(Packet &packet) {
   bool packet_complete = false;
   int packet_index = 0;
   
-  while(!packet_complete) {
+  while(!packet_complete && !this->canceled) {
     // Top the buffer off
     size_t prev_size = this->data_buffer.size();
     if(prev_size < 18) {
