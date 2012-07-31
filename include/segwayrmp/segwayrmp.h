@@ -396,22 +396,18 @@ public:
   configureUSBByIndex(int device_index, int baudrate = 460800);
 
   /*!
-   * Connects to the Segway.
-   * 
-   * \param operational_mode Defines the operation mode of the segway, this
-   *  must be tractor or balanced to have a successful connection.  If you
-   *  want to connect to the Segway but not put it in a mode, use disabled
-   *  (0). This will resulting in connecting to the Segway interface, but
-   *  not setting the mode or controller gain schedule.
-   *  Note: If you use default, you must manually set the operational mode
-   *  and controller gain schedule. The default is tractor.
-   * \param controller_gain_schedule This is the controller gain schedule
-   *  for the Segway vehicle, which is only used in balanced mode.  The
-   *  default is light and is the appropriate option if using tractor mode.
+   * Connects to the Segway. Ensure it has been configured first.
+   *
+   * \param reset_integrators If this is true, the integrators are reset.
    */
   void
-  connect(OperationalMode operational_mode = tractor,
-          ControllerGainSchedule controller_gain_schedule = light);
+  connect(bool reset_integrators = true);
+
+  /*!
+   * Sends a shutdown command to the RMP that immediately shuts it down.
+   */
+  void
+  shutdown();
 
   /*!
    * This command moves the base.
