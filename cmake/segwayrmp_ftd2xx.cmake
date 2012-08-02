@@ -16,6 +16,8 @@ if(UNIX)
   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     list(APPEND SEGWAYRMP_LINK_LIBS
       ${PROJECT_SOURCE_DIR}/ftd2xx/linux/${bitness}/libftd2xx.a
+      dl
+      rt
     )
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # If Mac OS X

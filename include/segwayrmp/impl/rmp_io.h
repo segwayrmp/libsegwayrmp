@@ -40,6 +40,7 @@
 #define RMP_IO_H
 
 #include <vector>
+#include <cstdio>
 
 #include <boost/thread.hpp>
 
