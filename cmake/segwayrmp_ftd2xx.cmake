@@ -19,6 +19,11 @@ if(UNIX)
       dl
       rt
     )
+    # Copy this file for rosmake to find it
+    file(
+      COPY ${PROJECT_SOURCE_DIR}/ftd2xx/linux/${bitness}/libftd2xx.a
+      DESTINATION ${PROJECT_SOURCE_DIR}/lib/
+    )
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # If Mac OS X
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

@@ -10,6 +10,10 @@
   <url>http://ros.org/wiki/libsegwayrmp</url>
   <depend package="serial"/>
 
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -Wl,-rpath,${prefix}/lib -lsegwayrmp -lftd2xx"/>
+  </export>
+
 </package>
 
 
