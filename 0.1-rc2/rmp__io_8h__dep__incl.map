@@ -1,9 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$segwayrmp_8h.html" title="include/segwayrmp.h" alt="" coords="188,161,333,189"/>
-<area shape="rect" id="node5" href="$rmp__io_8cpp.html" title="src/rmp_io.cpp" alt="" coords="4,238,112,266"/>
-<area shape="rect" id="node13" href="$rmp__ftd2xx_8h.html" title="include/impl/rmp_ftd2xx.h" alt="" coords="292,83,464,111"/>
-<area shape="rect" id="node17" href="$rmp__serial_8h.html" title="include/impl/rmp_serial.h" alt="" coords="462,161,631,189"/>
-<area shape="rect" id="node7" href="$segwayrmp_8cpp.html" title="src/segwayrmp.cpp" alt="" coords="137,238,273,266"/>
-<area shape="rect" id="node9" href="$rmp__ftd2xx_8cpp.html" title="src/impl/rmp_ftd2xx.cpp" alt="" coords="298,238,459,266"/>
-<area shape="rect" id="node11" href="$rmp__serial_8cpp.html" title="src/impl/rmp_serial.cpp" alt="" coords="483,238,641,266"/>
-</map>
