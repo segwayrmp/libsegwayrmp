@@ -334,13 +334,14 @@ void SegwayRMP::connect(bool reset_integrators)
 
   this->connected_ = true;
 
-  // Kick off the read thread
-  this->StartReadingContinuously_();
-
   if (reset_integrators) {
     // Reset all the integrators
     this->resetAllIntegrators();
   }
+
+  // Kick off the read thread
+  this->StartReadingContinuously_();
+
 }
 
 void SegwayRMP::shutdown()
