@@ -2,13 +2,10 @@
 	"folders":
 	[
 		{
-			"path": "/Users/william/devel/tmp/segwayrmp"
+			"path": "."
 		},
 		{
-			"path": "/Users/william/devel/segwayrmp_ws/libsegwayrmp"
-		},
-		{
-			"path": "/Users/william/devel/serial"
+			"path": "../serial"
 		}
 	],
 	"settings":
