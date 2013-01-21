@@ -16,6 +16,8 @@
 
   <author email="wjwwood@gmail.com">William Woodall</author>
 
+  <buildtool_depend>cmake</buildtool_depend>
+
   <build_depend>serial</build_depend>
   <run_depend>serial</run_depend>
   
