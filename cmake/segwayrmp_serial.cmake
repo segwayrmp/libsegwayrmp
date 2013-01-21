@@ -5,7 +5,7 @@ if(SEGWAYRMP_USE_SERIAL)
   set(SEGWAYRMP_USE_SERIAL FALSE)
   if(serial_FOUND)
     set(SEGWAYRMP_USE_SERIAL TRUE)
-    include_directories(serial_INCLUDE_DIRS)
+    include_directories(${serial_INCLUDE_DIRS})
     list(APPEND SEGWAYRMP_LINK_LIBS ${serial_LIBRARIES})
   else()
     # Could not find serial either through find_package or ROS
