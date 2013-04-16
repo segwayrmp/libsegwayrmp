@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 
 #include <segwayrmp/segwayrmp.h>
 #include <segwayrmp/impl/rmp_io.h>
