@@ -1,6 +1,7 @@
 #include "segwayrmp/segwayrmp.h"
 #include "segwayrmp/impl/rmp_ftd2xx.h"
 
+#include <iostream>
 #include <sstream>
 
 using namespace segwayrmp;
