@@ -18,6 +18,7 @@ if(UNIX)
       ${PROJECT_SOURCE_DIR}/ftd2xx/linux/${bitness}/libftd2xx.a
       dl
       rt
+      pthread
     )
     # Copy this file for rosmake to find it
     file(

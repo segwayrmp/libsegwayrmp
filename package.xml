@@ -18,6 +18,8 @@
 
   <buildtool_depend>cmake</buildtool_depend>
 
+  <run_depend>catkin</run_depend>
+
   <build_depend>serial</build_depend>
   <run_depend>serial</run_depend>
   
