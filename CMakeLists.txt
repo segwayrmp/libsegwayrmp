@@ -2,6 +2,11 @@
 cmake_minimum_required(VERSION 2.6)
 
 project(segwayrmp)
+set (segwayrmp_VERSION_MAJOR 0)
+set (segwayrmp_VERSION_MINOR 2)
+set (segwayrmp_VERSION_PATCH 6)
+set (segwayrmp_VERSION
+  "${segwayrmp_VERSION_MAJOR}.${segwayrmp_VERSION_MINOR}.${segwayrmp_VERSION_PATCH}")
 
 ## Configurations
 

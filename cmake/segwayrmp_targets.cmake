@@ -33,6 +33,15 @@ if(UNIX)
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif(UNIX)
 
+# Enable pkg-configuration file generation for linux
+if(UNIX AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  configure_file ("cmake/libsegwayrmp.pc.in" "cmake/libsegwayrmp.pc" @ONLY)
+  install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/libsegwayrmp.pc 
+    DESTINATION lib/pkgconfig/
+  )
+endif(UNIX AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
 # Configure make uninstall
 add_custom_target(uninstall @echo uninstall package)
 
