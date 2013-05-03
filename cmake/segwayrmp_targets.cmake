@@ -23,15 +23,12 @@ install(
 )
 
 # For now, enable installing the FTDI library on linux
-if(UNIX)
-  # If linux
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    install(
-      FILES lib/libftd2xx.a
-      DESTINATION lib/
-    )
-  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-endif(UNIX)
+if(UNIX AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  install(
+    FILES lib/libftd2xx.a
+    DESTINATION lib/
+  )
+endif(UNIX AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # Enable pkg-configuration file generation for linux
 if(UNIX AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
