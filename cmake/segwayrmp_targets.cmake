@@ -22,6 +22,17 @@ install(
   DESTINATION share/libsegwayrmp/
 )
 
+# For now, enable installing the FTDI library on linux
+if(UNIX)
+  # If linux
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    install(
+      FILES lib/libftd2xx.a
+      DESTINATION lib/
+    )
+  endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+endif(UNIX)
+
 # Configure make uninstall
 add_custom_target(uninstall @echo uninstall package)
 
