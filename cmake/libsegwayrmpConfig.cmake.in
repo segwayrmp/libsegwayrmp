@@ -1,0 +1,34 @@
+find_path(libsegwayrmp_INCLUDE_DIRS segwayrmp/segwayrmp.h
+  @CMAKE_INSTALL_PREFIX@/include
+  /usr/include
+  /usr/local/include
+)
+
+find_library(libsegwayrmp_LIBRARY segwayrmp
+  @CMAKE_INSTALL_PREFIX@/lib
+  @CMAKE_INSTALL_PREFIX@/lib64
+  /usr/lib
+  /usr/lib64
+  /usr/local/lib
+  /usr/local/lib64
+)
+set(libsegwayrmp_LIBRARIES ${libsegwayrmp_LIBRARY})
+
+# Try to find the ftd2xx library for linux, darwin, and other unix platforms
+if(UNIX)
+  find_library(ftd2xx_LIBRARY ftd2xx
+    @CMAKE_INSTALL_PREFIX@/lib
+    @CMAKE_INSTALL_PREFIX@/lib64
+    /usr/lib
+    /usr/lib64
+    /usr/local/lib
+    /usr/local/lib64
+  )
+  list(APPEND libsegwayrmp_LIBRARIES ${ftd2xx_LIBRARY})
+endif()
+
+if(NOT libsegwayrmp_INCLUDE_DIRS OR NOT libsegwayrmp_LIBRARIES)
+  set(libsegwayrmp_FOUND FALSE)
+else()
+  set(libsegwayrmp_FOUND TRUE)
+endif()

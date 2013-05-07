@@ -12,9 +12,14 @@ install(
   DESTINATION include/segwayrmp
 )
 
+configure_file(
+  "cmake/libsegwayrmpConfig.cmake.in"
+  "cmake/libsegwayrmpConfig.cmake"
+  @ONLY
+)
 install(
-  FILES       cmake/Findsegwayrmp.cmake
-  DESTINATION share/libsegwayrmp/
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/libsegwayrmpConfig.cmake 
+  DESTINATION share/libsegwayrmp
 )
 
 install(
