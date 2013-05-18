@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>libsegwayrmp</name>
-  <version>0.2.7</version>
+  <version>0.2.8</version>
   <description>
     This is a C++ library for interfacing with Segway's RMP line of robotic platforms.
   </description>
