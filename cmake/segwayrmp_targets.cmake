@@ -33,6 +33,7 @@ if(UNIX AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     FILES lib/libftd2xx.a
     DESTINATION lib/
   )
+  set(segwayrmp_ADDITIONAL_LIBRARIES "-ldl")
 endif(UNIX AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # Enable pkg-configuration file generation for linux

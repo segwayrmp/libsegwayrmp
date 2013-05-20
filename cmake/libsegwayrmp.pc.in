@@ -6,5 +6,5 @@ includedir=${prefix}/include
 Name: @CMAKE_PROJECT_NAME@
 Description: A cross-platform, open source interface to Segway's Robotic Mobile Platforms. It provides access to the interface of the RMP50, 100, 200, and 400 series via either serial rs-232 (VCP) or ftdi usb mode (D2XX).
 Version: @segwayrmp_VERSION@
-Libs: -L${libdir} -lsegwayrmp -lftd2xx
+Libs: -L${libdir} -lsegwayrmp -lftd2xx @segwayrmp_ADDITIONAL_LIBRARIES@
 Cflags: -I${includedir}

@@ -25,6 +25,10 @@ if(UNIX)
     /usr/local/lib64
   )
   list(APPEND libsegwayrmp_LIBRARIES ${ftd2xx_LIBRARY})
+  # On linux the symbols for dlopen need to be explicitly linked against
+  if(NOT APPLE)
+    list(APPEND libsegwayrmp_LIBRARIES dl)
+  endif()
 endif()
 
 if(NOT libsegwayrmp_INCLUDE_DIRS OR NOT libsegwayrmp_LIBRARIES)
