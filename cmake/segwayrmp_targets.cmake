@@ -1,7 +1,13 @@
 ## This file setups the targets like install and uninstall
 
+set(${PROJECT_NAME}_targets_to_install segwayrmp)
+# If the GUI is built, install it
+if (TARGET segwayrmp_gui)
+  list(APPEND ${PROJECT_NAME}_targets_to_install segwayrmp_gui)
+endif()
+
 install(
-  TARGETS segwayrmp
+  TARGETS ${${PROJECT_NAME}_targets_to_install}
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
@@ -18,7 +24,7 @@ configure_file(
   @ONLY
 )
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/libsegwayrmpConfig.cmake 
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/libsegwayrmpConfig.cmake
   DESTINATION share/libsegwayrmp
 )
 
