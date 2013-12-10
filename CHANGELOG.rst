@@ -2,6 +2,10 @@
 Changelog for package libsegwayrmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* The segwayrmp_gui is now installed so it is available from binaries
+
 0.2.9 (2013-06-11)
 ------------------
 * Export -ldl on Linux
