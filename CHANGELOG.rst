@@ -2,8 +2,8 @@
 Changelog for package libsegwayrmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.10 (2013-12-10)
+-------------------
 * The segwayrmp_gui is now installed so it is available from binaries
 
 0.2.9 (2013-06-11)
